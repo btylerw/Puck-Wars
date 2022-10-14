@@ -24,8 +24,6 @@ using namespace std;
 #include "amartinez2.h"
 //some structures
 
-const int MAX_PARTICLES = 1000;
-
 // Define some global variables
 class Global {
 public:
@@ -477,6 +475,7 @@ void physics()
 	}
     
 	// Check for puck/paddle collision
+	// Adds paddle velocity to puck velocity
     if ((puck.pos[1] - puck.w) < (paddle.pos[1] + paddle.h) &&
     	puck.pos[1] > (paddle.pos[1] - paddle.h) &&
     	puck.pos[0] > (paddle.pos[0] - paddle.w) &&
