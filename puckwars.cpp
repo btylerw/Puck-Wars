@@ -1,3 +1,6 @@
+//Tyler Brown, Andres Botello, Aldair Martinez, Anh Vu, Abisai Diaz Perez
+//
+//3350 Group 7 main source code file
 //Modified version of Waterfall framework
 //for an air hockey like game
 //
