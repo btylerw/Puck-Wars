@@ -14,5 +14,5 @@ log.o:	log.cpp
 
 clean:
 	rm -f puckwars
-	rm -f *.0
+	rm -f *.o
 
