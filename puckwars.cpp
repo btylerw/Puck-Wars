@@ -115,7 +115,6 @@ Image *backgroundImage = NULL;
 Image *creditImage = NULL;
 Image *helpImage = NULL;
 
-void make_bricks(float w, float h, float x, float y);
 
 class Box {
     public:
@@ -132,7 +131,6 @@ class Box {
    		pos[0] = x = gl.xres / 2.0;
    		pos[1] = y = gl.yres / 4;
 		vel[0] = vel[1] = 0.0;
-		make_bricks(w, h, x, y);
     }
 	Box(double width, double p0, double p1, double v1) {
     	w = width;
@@ -144,31 +142,7 @@ class Box {
 
 Box paddle;
 Box puck(10, gl.xres / 2, gl.yres / 1.2, 0.0);
-Box bricks[20];
 int n = 0;
-
-void make_bricks(float w, float h, float x, float y)
-{
-	x = gl.xres;
-	y = gl.yres - 20;
-	w = 60.0f;
-	for (int i = 0; i < 20; i++) {
-		bricks[i].h = h;
-		bricks[i].w = w;
-		if (i < 10) {
-			bricks[i].pos[0] = -w;
-		}
-		else if (i == 10) {
-			y = gl.yres-20;
-			bricks[i].pos[0] = x + w;
-		}
-		else {
-			bricks[i].pos[0] = x + w;
-		}
-		bricks[i].pos[1] = y;
-		y-=100;
-	}
-}
 
 class X11_wrapper {
 private:
@@ -200,6 +174,7 @@ void render(void);
 int main()
 {
 	init_opengl();
+	make_bricks(gl.xres, gl.yres);
 	//Main loop
 	int done = 0;
 	while (!done) {
@@ -543,58 +518,15 @@ void physics()
 				}
 			}
 	}
-	for (int i = 0; i < 20; i++) {
-    	if ((puck.pos[1] - puck.w) < (bricks[i].pos[1] + bricks[i].h) &&
-    		puck.pos[1] > (bricks[i].pos[1] - bricks[i].h) &&
-    		puck.pos[0] > (bricks[i].pos[0] - bricks[i].w) &&
-    		puck.pos[0] < (bricks[i].pos[0] + bricks[i].w)) {
-				if (puck.pos[0] > bricks[i].pos[0]) {
-					puck.vel[1] = 0;
-					puck.pos[1] = bricks[i].pos[1] + bricks[i].h;
-					puck.vel[1] += bricks[i].vel[1];
-					puck.vel[0] = 2;
-					if (bricks[i].vel[1] <= 0)
-						puck.vel[1] = 0;
-				}
-
-				else if (puck.pos[0] < bricks[i].pos[0]) {
-					puck.vel[1] = 0;
-					puck.pos[1] = bricks[i].pos[1] + bricks[i].h;
-					puck.vel[1] += bricks[i].vel[1];
-					puck.vel[0] = -2;
-					if (bricks[i].vel[1] <= 0)
-						puck.vel[1] = 0;
-				}
-
-				else {
-					puck.vel[1] = 0;
-					puck.pos[1] = bricks[i].pos[1] + bricks[i].h;
-					puck.vel[1] += bricks[i].vel[1];
-					if (bricks[i].vel[1] <= 0) {
-						float new_vel = -puck.vel[1] / 3;
-						puck.vel[1] = 0;
-						puck.vel[1] = new_vel;
-					}
-				}
-		}
-	}
 
 	if (gl.bricks_feature) {
-		for (int i = 0; i < 20; i++) {
-			bricks[i].pos[0] += change_brick_vel(i, bricks[i].pos[0]);
-			if (i < 10 && bricks[i].pos[0]-bricks[i].w > 600) {
-				gl.bricks_feature = 0;
-			}
-			else if (i >= 10 && bricks[i].pos[0] + bricks[i].w < 0) {
-				gl.bricks_feature = 0;
-			}
-		}
+		move_bricks();
 	}
 	else {
-		for (int i = 0; i < 20; i++) {
-			bricks[i].pos[0] = reset_brick_pos(i, bricks[i].w, gl.xres);
-		}
+		reset_brick_pos(gl.xres);
 	}
+
+	check_brick_hit(puck.w, puck.pos[0], puck.pos[1], puck.vel[0], puck.vel[1]);
 }
 
 void pause_screen()
@@ -632,6 +564,7 @@ void render()
 	r.center = -5;
 	if (!gl.pressed) {
     	ggprint8b(&r, 16, 0x00ff0000, "PRESS SPACE TO START");
+		ggprint8b(&r, 16, 0x00ff0000, "F12 - START/STOP BRICK FEATURE MODE");
 	}
 	// Draw paddle
 	glPushMatrix();
@@ -656,34 +589,19 @@ void render()
 	glEnd();
 	glPopMatrix();
 	// Draw bricks
-	for (int i = 0; i < 20; i++) {
-		glPushMatrix();
-		glColor3ub(0, 0, 0);
-		glTranslatef(bricks[i].pos[0], bricks[i].pos[1], 0.0f);
-		glBegin(GL_QUADS);
-			glVertex2f(-bricks[i].w, -bricks[i].h);
-			glVertex2f(-bricks[i].w, bricks[i].h);
-			glVertex2f(bricks[i].w, bricks[i].h);
-			glVertex2f(bricks[i].w, -bricks[i].h);
-		glEnd();
-		glPopMatrix();
-	}
+	draw_bricks();
 	if (gl.intro_screen) {
 		show_intro_screen(introTexture, gl.xres, gl.yres);
 	}
-	
 	if (gl.pause) {
 		pause_screen();
 	}
-
 	if (gl.help_screen) {
 		help_screen(helpTexture, gl.xres, gl.yres);
 	}
-
 	if (gl.feature != 0) {
 		showFeature(gl.xres, gl.yres);
 	}
-	
 	if (gl.credit != 0) {
 		showCredit(creditTexture, gl.xres, gl.yres);
 		r.bot = gl.yres-50;
