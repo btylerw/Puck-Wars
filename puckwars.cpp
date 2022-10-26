@@ -38,8 +38,6 @@ class Global {
 	unsigned int feature;
 	unsigned int pause;
 	unsigned int cheat;
-	unsigned int speed;
-	unsigned int big;
 	int help_screen;
 	int bricks_feature;
 	Global()
@@ -56,8 +54,6 @@ class Global {
 	    help_screen = 0;
 	    bricks_feature = 0;
 	    cheat = 0;
-	    speed = 0;
-	    big = 0;
 
 	}
 } gl;
@@ -354,12 +350,12 @@ int X11_wrapper::check_keys(XEvent *e)
 	    case XK_d:
 		gl.cheat = manage_cstate(gl.cheat);
 		break;
-	    case XK_s:
-		gl.speed = manage_sstate(gl.speed);
-		break;
-	    case XK_b:
-		gl.big = manage_bstate(gl.big);
-		break;
+	    //case XK_s:
+		//gl.speed = manage_sstate(gl.speed);
+		//break;
+	   // case XK_b:
+		//gl.big = manage_bstate(gl.big);
+		//break;
 	    case XK_F1:
 		if (gl.help_screen)
 		    gl.help_screen = 0;
@@ -483,6 +479,7 @@ void init_opengl(void)
 
 void physics()
 {   
+    //pauses game
     if(!gl.pause){ 
 	// Saving previous paddle pos for velocity calculation
 	int old_pos = paddle.pos[1];
@@ -560,11 +557,6 @@ void physics()
 
 	check_brick_hit(puck.w, puck.pos[0], puck.pos[1], puck.vel[0], puck.vel[1]);
     }
-    //gives puck speed in cheat mode
-    if (gl.speed && gl.cheat){
-	puck.vel[1] *= 1.05;
-    }
-
 }
 
 void render()
@@ -618,8 +610,6 @@ void render()
     }
     if (gl.pause) {
 	pause_screen(pauseTexture, gl.xres, gl.yres);
-    }
-    if (gl.big && gl.cheat){
     }
     if (gl.cheat){
 	ggprint8b(&r, 20, 0x00ff0000, "CHEATER MODE:");
