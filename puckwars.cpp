@@ -395,7 +395,7 @@ void init_opengl(void)
     //Needed for text to be added
     glEnable(GL_TEXTURE_2D);
     initialize_fonts();
-	
+
 	// Load images
     introImage 		= &img[0];
     backgroundImage = &img[1];
@@ -598,9 +598,18 @@ void render()
 	}
 	if (gl.help_screen) {
 		help_screen(helpTexture, gl.xres, gl.yres);
+		r.bot = gl.yres/2;
+        	ggprint16(&r, 0, 0x0088aaff, "To activate your cheat code: ");
+        	r.bot = gl.yres/2 -50;
+        	ggprint16(&r, 0, 0x0088aaff, "Pressing f");
+
 	}
 	if (gl.feature != 0) {
-		showFeature(gl.xres, gl.yres);
+		pause_screen();
+        	showCheat(gl.xres, gl.yres);
+        	r.bot = gl.yres - 120;
+        	ggprint16(&r, 0, 0x0088aaff, "Cheat Time");
+
 	}
 	if (gl.credit != 0) {
 		showCredit(creditTexture, gl.xres, gl.yres);
