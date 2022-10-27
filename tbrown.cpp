@@ -112,32 +112,15 @@ extern void check_brick_hit(float &puckw, float &puckpos0, float &puckpos1, floa
         puckpos0 > (bricks[i].pos[0] - bricks[i].w) &&
         puckpos0 < (bricks[i].pos[0] + bricks[i].w)) {
         	if (puckpos0 > bricks[i].pos[0]) {
- 	       		puckvel1 = 0;
-           		puckpos1 = bricks[i].pos[1] + bricks[i].h;
-           		puckvel1 += bricks[i].vel[1];
-           		puckvel0 = 2;
-           		if (bricks[i].vel[1] <= 0)
-               		puckvel1 = 0;
+				puckvel1 = -puckvel1;
         	}
 
         	else if (puckpos0 < bricks[i].pos[0]) {
-                puckvel1 = 0;
-                puckpos1 = bricks[i].pos[1] + bricks[i].h;
-                puckvel1 += bricks[i].vel[1];
-                puckvel0 = -2;
-                if (bricks[i].vel[1] <= 0)
-                    puckvel1 = 0;
+                puckvel1 = -puckvel1;
        		}
 
        		else {
-            	puckvel1 = 0;
-                puckpos1 = bricks[i].pos[1] + bricks[i].h;
-                puckvel1 += bricks[i].vel[1];
-                if (bricks[i].vel[1] <= 0) {
-                    float new_vel = -puckvel1 / 3;
-                    puckvel1 = 0;
-                    puckvel1 = new_vel;
-                }
+            	puckvel1 = -puckvel1;
             }
 
 		}
