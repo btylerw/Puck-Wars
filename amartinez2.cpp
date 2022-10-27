@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <GL/glx.h>
+#include <cmath>
 #include "amartinez2.h"
 
 using namespace std;
@@ -55,4 +56,16 @@ extern void help_screen(GLuint help_screen_img, int xres, int yres)
 	cout << "Mouse movement: move paddle\n";
 	cout << "F1 key: close help screen\n";	
 	*/
+}
+extern void draw_circle(float cx, float cy, float radius, int segs)
+{
+    glBegin(GL_TRIANGLE_FAN);
+    for(int i=0; i<segs; i++) {
+	float theta = 3.1415926 * 2 * i / float(segs);
+	float x = radius * cosf(theta);
+	float y = radius * sinf(theta);
+	glVertex2f(x + cx, y + cy);
+    }
+    glEnd();
+
 }

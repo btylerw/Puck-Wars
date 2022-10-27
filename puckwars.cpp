@@ -38,6 +38,7 @@ class Global {
 	unsigned int feature;
 	unsigned int pause;
 	unsigned int cheat;
+	unsigned int circleShape;
 	int help_screen;
 	int bricks_feature;
 	Global()
@@ -54,6 +55,7 @@ class Global {
 	    help_screen = 0;
 	    bricks_feature = 0;
 	    cheat = 0;
+		circleShape = 0;
 
 	}
 } gl;
@@ -171,6 +173,7 @@ class X11_wrapper {
 void init_opengl(void);
 void physics(void);
 void render(void);
+void draw_circle(float cx, float cy, float radius, int segs);
 
 
 //=====================================
@@ -380,6 +383,9 @@ int X11_wrapper::check_keys(XEvent *e)
 	    case XK_F12:
 		gl.bricks_feature = !gl.bricks_feature;
 		break;
+		case XK_q:
+		gl.circleShape ^= 1;
+		break;
 	}
     }
     return 0;
@@ -580,28 +586,39 @@ void render()
     if (!gl.pressed) {
 	ggprint8b(&r, 16, 0x00ff0000, "PRESS SPACE TO START");
 	ggprint8b(&r, 16, 0x00ff0000, "F12 - START/STOP BRICK FEATURE MODE");
+	ggprint8b(&r, 20, 0x00ff0000, "PRESS Q TO CHANGE PADDLE/PUCK SHAPE");
     }
     // Draw paddle
     glPushMatrix();
     glColor3ub(100, 200, 100);
-    glTranslatef(paddle.pos[0], paddle.pos[1], 0.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(-paddle.w, -paddle.h);
-    glVertex2f(-paddle.w,  paddle.h);
-    glVertex2f(paddle.w, paddle.h);
-    glVertex2f(paddle.w, -paddle.h);
-    glEnd();
+	if (gl.circleShape){
+		draw_circle(paddle.pos[0], paddle.pos[1], 30.0, 360);
+	}
+	else {
+    	glTranslatef(paddle.pos[0], paddle.pos[1], 0.0f);
+    	glBegin(GL_QUADS);
+    	glVertex2f(-paddle.w, -paddle.h);
+    	glVertex2f(-paddle.w,  paddle.h);
+    	glVertex2f(paddle.w, paddle.h);
+   		glVertex2f(paddle.w, -paddle.h);
+		glEnd();
+	}
     glPopMatrix();
     // Draw puck
     glPushMatrix();
     glColor3ub(150, 160, 220);
-    glTranslatef(puck.pos[0], puck.pos[1], 0.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(-puck.w, -puck.w);
-    glVertex2f(-puck.w, puck.w);
-    glVertex2f(puck.w, puck.w);
-    glVertex2f(puck.w, -puck.w);
-    glEnd();
+	if (gl.circleShape) {
+		draw_circle(puck.pos[0], puck.pos[1], 12.0, 360);
+	}
+	else {
+    	glTranslatef(puck.pos[0], puck.pos[1], 0.0f);
+    	glBegin(GL_QUADS);
+    	glVertex2f(-puck.w, -puck.w);
+    	glVertex2f(-puck.w, puck.w);
+    	glVertex2f(puck.w, puck.w);
+    	glVertex2f(puck.w, -puck.w);
+    	glEnd();
+	}
     glPopMatrix();
     // Draw bricks
     draw_bricks();
