@@ -10,3 +10,6 @@ extern void make_bricks(int x, int y);
 extern void check_brick_hit(float &puckw, float &puckpos1, float &puckpos2, float &puckvel0, float &puckvel1);
 extern void draw_bricks();
 extern void move_bricks();
+extern void set_goals(int x, int y);
+extern int check_goal(float puckpos0, float puckpos1, float puckw);
+

@@ -51,6 +51,19 @@ class Bricks {
 
 // Creates bricks to obstruct puck
 Bricks bricks[20];
+Bricks goals[2];
+
+extern void set_goals(int x, int y)
+{
+    	goals[0].h = 10.0f;
+	goals[0].w = 95.0f;
+	goals[1].h = 10.0f;
+	goals[1].w = 95.0f;
+	goals[0].pos[0] = x / 2;
+	goals[0].pos[1] = goals[0].h;
+	goals[1].pos[0] = x / 2;
+	goals[1].pos[1] = y - goals[0].h;
+}
 
 // Picks random brick to move
 // If brick is on left side of screen, moves right
@@ -141,7 +154,8 @@ extern void draw_bricks()
 			glVertex2f(bricks[i].w, -bricks[i].h);
 		glEnd();
 		glPopMatrix();
-	}	
+	}
+
 }
 
 // Updates brick positions, will probably be combined with change_brick_vel() in future
@@ -156,4 +170,18 @@ extern void move_bricks()
 				bricks[i].pos[0] = 600 + bricks[i].w;
 		}
 	}
+}
+
+// Checks if puck scored or not
+extern int check_goal(float puckpos0, float puckpos1, float puckw)
+{
+        if ((puckpos1 - puckw) < (goals[1].pos[1] + goals[1].h) &&
+        puckpos1 > (goals[1].pos[1] - goals[1].h) &&
+        puckpos0 > (goals[1].pos[0] - goals[1].w) &&
+        puckpos0 < (goals[1].pos[0] + goals[1].w)) {
+			return 1;
+		}
+		else
+			return 0;
+	
 }
