@@ -172,8 +172,8 @@ extern void move_bricks()
 	}
 }
 
-// Checks if puck scored or not
-extern int check_goal(float puckpos0, float puckpos1, float puckw)
+// Checks if puck goes into AI goal
+extern int check_player_goal(float puckpos0, float puckpos1, float puckw)
 {
         if ((puckpos1 - puckw) < (goals[1].pos[1] + goals[1].h) &&
         puckpos1 > (goals[1].pos[1] - goals[1].h) &&
@@ -184,4 +184,17 @@ extern int check_goal(float puckpos0, float puckpos1, float puckw)
 		else
 			return 0;
 	
+}
+
+// Checks if puck goes into your goal
+extern int check_ai_goal(float puckpos0, float puckpos1, float puckw)
+{
+	if ((puckpos1 + puckw) > (goals[0].pos[1] - goals[0].h) &&
+	puckpos1 < (goals[0].pos[1] + goals[0].h) &&
+	puckpos0 > (goals[0].pos[0] - goals[0].w) &&
+	puckpos0 < (goals[0].pos[0] + goals[0].w)) {
+		return 1;
+	}
+	else
+		return 0;
 }

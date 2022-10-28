@@ -41,7 +41,8 @@ class Global {
 	unsigned int circleShape;
 	int help_screen;
 	int bricks_feature;
-	int score;
+	int player_score;
+	int ai_score;
 	bool firstTime;
 	Global()
 	{
@@ -56,7 +57,8 @@ class Global {
 	    feature = 0;
 	    help_screen = 0;
 	    bricks_feature = 0;
-	    score = 0;
+	    player_score = 0;
+		ai_score = 0;
 	    cheat = 0;
 		circleShape = 0;
 		firstTime = true;
@@ -404,6 +406,8 @@ void reset()
     puck.vel[0] 	= puck.vel[1] = 0;
     paddle.pos[0] 	= gl.xres /2;
     gl.firstTime = true;
+	reset_brick_pos(gl.xres);
+	gl.bricks_feature = 0;
 }
 
 void init_opengl(void)
@@ -522,8 +526,9 @@ void physics()
 
 	// If puck falls below screen, reset game
 	if (puck.pos[1] - puck.w < 0) {
-	    gl.pressed = 0;
-	    reset();
+		puck.vel[1] = -puck.vel[1];
+	    //gl.pressed = 0;
+	    //reset();
 	}
 
 	// Check for puck/paddle collision
@@ -571,10 +576,15 @@ void physics()
 	}
 
 	check_brick_hit(puck.w, puck.pos[0], puck.pos[1], puck.vel[0], puck.vel[1]);
-	if (check_goal(puck.pos[0], puck.pos[1], puck.w)) {
+	if (check_player_goal(puck.pos[0], puck.pos[1], puck.w)) {
 	    reset();
-	    gl.score++;
+	    gl.player_score++;
 	    gl.pressed = 0;
+	}
+	if (check_ai_goal(puck.pos[0], puck.pos[1], puck.w)) {
+		reset();
+		gl.ai_score++;
+		gl.pressed = 0;
 	}
     }
 }
@@ -597,7 +607,8 @@ void render()
 	r.bot = gl.yres - 40;
 	r.left = 30;
 	r.center = 0;
-	ggprint8b(&r, 16, 0x000000ff, "Score: %d", gl.score);
+	ggprint8b(&r, 16, 0x000000ff, "Your Score: 	%d", gl.player_score);
+	ggprint8b(&r, 16, 0x000000ff, "AI Score:	%d", gl.ai_score);
     r.bot = gl.yres/1.5;
     r.left = gl.xres/2;
     r.center = -5;
