@@ -12,12 +12,6 @@
 //std::string credit_html =
 //#include "credit.html";
 
-/*unsigned int manage_state(unsigned int s)
-  {
-  s = s ^ 1;
-  return s;
-  }*/
-
 extern int showCredit(GLuint creditTexture, int xres, int yres) 
 {	  
     glBindTexture(GL_TEXTURE_2D, creditTexture);
@@ -77,6 +71,7 @@ extern void drawCheatCode(int xres, int yres) {
 }
 
 //passcode
+//stil working on this one  <<<-----------
 void drawCodeBox(int xres, int yres) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
@@ -84,10 +79,8 @@ void drawCodeBox(int xres, int yres) {
     glColor4f(4.0, 4.0, 4.0, 0.5);
     int w = 400;
     glBegin(GL_TRIANGLE_STRIP);
-    //glVertex2i(0+w   , yres-w);
     glVertex2i(0+w   , w);
     glVertex2i(xres-w, w);
-    //glVertex2i(xres-w, yres-w);
     glEnd();
     glDisable(GL_BLEND);
 
@@ -107,17 +100,39 @@ void drawCircle(int x, int y, GLfloat xcenter, GLfloat ycenter) {
     }
     glEnd();
 }
+
+void allCircle(int xres, int yres) {
+    //red
+    glColor3f(1.0f, 0.0f, 0.0f);
+    drawCircle(xres/2, yres/2 + 80, 30, 30);
+    drawCircle(xres/2 - 80, yres/2 +80, 30, 30);
+    drawCircle(xres/2 + 80, yres/2 +80, 30, 30);
+    //green
+    glColor3f(0.0f, 1.0f, 0.0f);
+    drawCircle(xres/2 - 80, yres/2 + 160, 30, 30);
+    drawCircle(xres/2 + 80, yres/2 + 160, 30, 30);
+    drawCircle(xres/2, yres/2 + 160, 30, 30);
+    //blue
+    glColor3f(0.0f, 0.0f, 1.0f);
+    drawCircle(xres/2 + 80, yres/2, 30, 30); 
+    drawCircle(xres/2 - 80, yres/2, 30, 30);
+    drawCircle(xres/2, yres/2, 30, 30);
+}
 //function call
 void showCheat(int xres, int yres) {
     float r = 4;
-    int b;
+    int b ;
+    int c = 0;
     srand((unsigned)time(NULL));
     b = rand() % 10;
+    showFeature(xres, yres);
     drawCheatCode(xres, yres);
     drawCodeBox(xres, yres);
-    for (int i = 0; i < 10; i++) {
-    	drawCircle(xres/2, yres/2 + 5*b*i, 30, 30);
-    }
+    /*for (int i = 0; i < 10; i++) {
+      drawCircle(xres/2, yres/2 + 5*b*i, 30, 30);
+      }*/
+    allCircle(xres, yres);
+
 }
 
 

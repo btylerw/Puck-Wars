@@ -41,7 +41,6 @@ class Global {
 	unsigned int circleShape;
 	int help_screen;
 	int bricks_feature;
-	bool firstTime;
 	Global()
 	{
 	    xres = 600;
@@ -56,8 +55,7 @@ class Global {
 	    help_screen = 0;
 	    bricks_feature = 0;
 	    cheat = 0;
-	    circleShape = 0;
-	    firstTime = true;
+		circleShape = 0;
 
 	}
 } gl;
@@ -400,7 +398,6 @@ void reset()
     puck.pos[1] 	= gl.yres / 1.2;
     puck.vel[0] 	= puck.vel[1] = 0;
     paddle.pos[0] 	= gl.xres /2;
-    gl.firstTime = true;
 }
 
 void init_opengl(void)
@@ -495,18 +492,14 @@ void physics()
 	// Updates paddle position with new mouse coordinates
 	paddle.pos[0] = gl.mouse_x;
 	paddle.pos[1] = gl.mouse_y;
-	if (paddle.pos[1] > 580)
-	    paddle.pos[1] = 580;
+	if (paddle.pos[1] > 300)
+	    paddle.pos[1] = 300;
 	paddle.vel[1] = (paddle.pos[1] - old_pos) / 1.5;
 	// Puck begins to move
 	if (gl.pressed) {
 	    puck.pos[0] += puck.vel[0];
 	    puck.pos[1] += puck.vel[1];
-	    if(gl.firstTime){
-		//gravity
-	    	puck.vel[1] -= 0.07;
-	    }
-	    	
+	    puck.vel[1] -= 0.1;
 	}
 
 	// Checking for wall collision
@@ -531,7 +524,6 @@ void physics()
 		puck.pos[1] > (paddle.pos[1] - paddle.h) &&
 		puck.pos[0] > (paddle.pos[0] - paddle.w) &&
 		puck.pos[0] < (paddle.pos[0] + paddle.w)) {
-		gl.firstTime = false;
 	    if (puck.pos[0] > paddle.pos[0]) {
 		puck.vel[1] = 0;
 		puck.pos[1] = paddle.pos[1] + paddle.h;
@@ -651,6 +643,7 @@ void render()
 
     }
     if (gl.feature != 0) {
+	pause_screen(pauseTexture, gl.xres, gl.yres);
 	showCheat(gl.xres, gl.yres);
 	r.bot = gl.yres - 120;
 	ggprint16(&r, 0, 0x0088aaff, "Cheat Time");
