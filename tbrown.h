@@ -13,3 +13,4 @@ extern void move_bricks();
 extern void set_goals(int x, int y);
 extern int check_player_goal(float puckpos0, float puckpos1, float puckw);
 extern int check_ai_goal(float puckpos0, float puckpos1, float puckw);
+extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float &puckvel1, int y);

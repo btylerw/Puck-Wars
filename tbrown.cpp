@@ -38,6 +38,7 @@ class Bricks {
 		float h;
 		float x;
 		float y;
+		float old_x;
 		float pos[2];
 		float vel[2];
 		Bricks() {
@@ -46,16 +47,18 @@ class Bricks {
 			pos[0] = x = 0.0;
 			pos[1] = y = 0.0;
 			vel[0] = vel[1] = 0;
+			old_x = 0;
 		}
 };
 
 // Creates bricks to obstruct puck
 Bricks bricks[20];
 Bricks goals[2];
+Bricks ai_paddle;
 
 extern void set_goals(int x, int y)
 {
-    	goals[0].h = 10.0f;
+   	goals[0].h = 10.0f;
 	goals[0].w = 95.0f;
 	goals[1].h = 10.0f;
 	goals[1].w = 95.0f;
@@ -114,6 +117,10 @@ extern void make_bricks(int x, int y)
 		bricks[i].pos[1] = yres;
 		yres-=100;
 	}
+	ai_paddle.w = 30.0f;
+	ai_paddle.pos[0] = x/2.0;
+	ai_paddle.pos[1] = y/1.1;
+	ai_paddle.old_x = x/2.0;
 }
 
 // Check for collision with puck. Needs more work to check underside collision
@@ -155,6 +162,18 @@ extern void draw_bricks()
 		glEnd();
 		glPopMatrix();
 	}
+    glPushMatrix();
+    glColor3ub(100, 200, 100);
+    glTranslatef(ai_paddle.pos[0], ai_paddle.pos[1], 0.0f);
+    glBegin(GL_QUADS);
+	    glVertex2f(-ai_paddle.w, -ai_paddle.h);
+        glVertex2f(-ai_paddle.w, ai_paddle.h);
+        glVertex2f(ai_paddle.w, ai_paddle.h);
+        glVertex2f(ai_paddle.w, -ai_paddle.h);
+    glEnd();
+    glPopMatrix();
+    
+
 
 }
 
@@ -197,4 +216,32 @@ extern int check_ai_goal(float puckpos0, float puckpos1, float puckw)
 	}
 	else
 		return 0;
+}
+
+// AI paddle tracks puck location, moves back to center if not coming towards it's side
+extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float &puckvel1, int y)
+{
+	ai_paddle.pos[0] += ai_paddle.vel[0];
+	if ((puckpos1 - puckw) < (ai_paddle.pos[1] + ai_paddle.h) &&
+        puckpos1 > (ai_paddle.pos[1] - ai_paddle.h) &&
+        puckpos0 > (ai_paddle.pos[0] - ai_paddle.w) &&
+        puckpos0 < (ai_paddle.pos[0] + ai_paddle.w)) {
+			puckvel1 = -puckvel1;
+		}
+
+	if (puckpos1 > y / 2 && puckvel1 > 0) {
+		if (puckpos0 > ai_paddle.pos[0])
+			ai_paddle.vel[0] = 3;
+		else if (puckpos0 < ai_paddle.pos[0])
+			ai_paddle.vel[0] = -3;
+	}
+// Commented out for difficulty testing
+//	else if (ai_paddle.pos[0] < ai_paddle.old_x) {
+//		ai_paddle.vel[0] = 3;
+//	}
+//	else if (ai_paddle.pos[0] > ai_paddle.old_x) {
+//		ai_paddle.vel[0] = -3;
+//	}
+	else
+		ai_paddle.vel[0] = 0;
 }

@@ -154,7 +154,7 @@ class Box {
 };
 
 Box paddle;
-Box puck(10, gl.xres / 2, gl.yres / 1.2, 0.0);
+Box puck(10, gl.xres / 2, gl.yres / 2, 0.0);
 int n = 0;
 
 class X11_wrapper {
@@ -402,7 +402,7 @@ int X11_wrapper::check_keys(XEvent *e)
 void reset()
 {
     puck.pos[0] 	= gl.xres / 2;
-    puck.pos[1] 	= gl.yres / 1.2;
+    puck.pos[1] 	= gl.yres / 2;
     puck.vel[0] 	= puck.vel[1] = 0;
     paddle.pos[0] 	= gl.xres /2;
     gl.firstTime = true;
@@ -567,6 +567,7 @@ void physics()
 		}
 	    }
 	}
+	ai_paddle_physics(puck.pos[0], puck.pos[1], puck.w, puck.vel[1], gl.yres);	
 
 	if (gl.bricks_feature) {
 	    move_bricks();
