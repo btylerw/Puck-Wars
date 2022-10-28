@@ -503,7 +503,8 @@ void physics()
 	    puck.pos[0] += puck.vel[0];
 	    puck.pos[1] += puck.vel[1];
 	    if(gl.firstTime){
-	    	puck.vel[1] -= 0.1;
+		//gravity
+	    	puck.vel[1] -= 0.07;
 	    }
 	    	
 	}
