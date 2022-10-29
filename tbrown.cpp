@@ -4,7 +4,7 @@
 #include "tbrown.h"
 #include <iostream>
 #include <cstdlib>
-
+#include <cmath>
 // Renders intro screen
 extern void show_intro_screen(GLuint introTexture, int xres, int yres)
 {
@@ -164,6 +164,7 @@ extern void draw_bricks()
 	}
     glPushMatrix();
     glColor3ub(100, 200, 100);
+	/*
     glTranslatef(ai_paddle.pos[0], ai_paddle.pos[1], 0.0f);
     glBegin(GL_QUADS);
 	    glVertex2f(-ai_paddle.w, -ai_paddle.h);
@@ -172,8 +173,15 @@ extern void draw_bricks()
         glVertex2f(ai_paddle.w, -ai_paddle.h);
     glEnd();
     glPopMatrix();
-    
-
+    */
+	glBegin(GL_TRIANGLE_FAN);
+	for (int i = 0; i < 360; i++) {
+		float theta = 3.1415926 * 2 * i / 360.0;
+		float x = 30.0 * cosf(theta);
+		float y = 30.0 * sinf(theta);
+		glVertex2f(x + ai_paddle.pos[0], y + ai_paddle.pos[1]);
+	}
+	glEnd();
 
 }
 
@@ -231,9 +239,9 @@ extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float
 
 	if (puckpos1 > y / 2 && puckvel1 > 0) {
 		if (puckpos0 > ai_paddle.pos[0])
-			ai_paddle.vel[0] = 3;
+			ai_paddle.vel[0] = 5;
 		else if (puckpos0 < ai_paddle.pos[0])
-			ai_paddle.vel[0] = -3;
+			ai_paddle.vel[0] = -5;
 	}
 // Commented out for difficulty testing
 //	else if (ai_paddle.pos[0] < ai_paddle.old_x) {
