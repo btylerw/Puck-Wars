@@ -28,6 +28,8 @@ using namespace std;
 //some structures
 
 // Define some global variables
+typedef float pUpVec[3]; //power up vector
+
 class Global {
     public:
 	int xres, yres;
@@ -39,11 +41,14 @@ class Global {
 	unsigned int pause;
 	unsigned int cheat;
 	unsigned int circleShape;
+	unsigned int powerUp;
 	int help_screen;
 	int bricks_feature;
 	int player_score;
 	int ai_score;
 	bool firstTime;
+	pUpVec p1, p2; //points for power up location
+
 	Global()
 	{
 	    xres = 600;
@@ -61,6 +66,7 @@ class Global {
 		ai_score = 0;
 	    cheat = 0;
 		circleShape = 0;
+		powerUp = 0;
 		firstTime = true;
 
 	}
@@ -393,6 +399,14 @@ int X11_wrapper::check_keys(XEvent *e)
 		case XK_q:
 		gl.circleShape ^= 1;
 		break;
+		case XK_x:
+		gl.powerUp ^= 1;
+		if(gl.powerUp == 1)
+			//random points on screen
+			gl.p1[0] = rand() % gl.xres;
+			gl.p1[1] = rand() % gl.yres;
+			//gl.powerUp = 0;
+		break;
 	}
     }
     return 0;
@@ -510,7 +524,7 @@ void physics()
 	    puck.pos[0] += puck.vel[0];
 	    puck.pos[1] += puck.vel[1];
 	    if (gl.firstTime) {
-	    puck.vel[1] -= 0.7;
+	    puck.vel[1] -= 0.07;
 	    }
 	}
 
@@ -685,4 +699,7 @@ void render()
 	r.bot = gl.yres-100;
 	ggprint16(&r, 0, 0x0088aaff, "Tyler, Andres, Aldair, Anh, Abisai");
     }
+	if(gl.powerUp) {
+		drawPowerUps(gl.p1);
+	}
 }
