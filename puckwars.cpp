@@ -50,6 +50,7 @@ class Global {
 	bool firstTime;
 	pUpVec p1, p2; //points for power up location
 	int pUpSize;
+	int speedCap;
 	Global()
 	{
 	    xres = 600;
@@ -68,9 +69,9 @@ class Global {
 	    cheat = 0;
 		circleShape = 0;
 		powerUp = 0;
-		pUpSize = 35;
+		pUpSize = 40;
+		speedCap = 22;
 		firstTime = true;
-
 	}
 } gl;
 
@@ -187,6 +188,7 @@ class X11_wrapper {
 void init_opengl(void);
 void physics(void);
 void render(void);
+void reset();
 //void draw_circle(float cx, float cy, float radius, int segs);
 
 
@@ -380,6 +382,10 @@ int X11_wrapper::check_keys(XEvent *e)
 		else
 		    gl.help_screen = 1;
 		break;
+		case XK_r:
+			reset();
+			gl.pressed = 0;
+		break;
 	    case XK_c:
 		gl.credit += 1;
 		if (gl.credit > 1) {
@@ -406,9 +412,9 @@ int X11_wrapper::check_keys(XEvent *e)
 		if(gl.powerUp == 1)
 			//random points on screen
 			//x axis
-			gl.p1[0] = rand() % gl.xres;
+			gl.p1[0] = ((rand() % gl.xres) * 0.75) + (gl.xres * 0.17);
 			//y axis
-			gl.p1[1] = rand() % gl.yres;
+			gl.p1[1] = ((rand() % gl.yres) * 0.7) + (gl.yres * 0.2);
 
 			//gl.powerUp = 0;
 
@@ -551,17 +557,14 @@ void physics()
 	    //reset();
 	}
 if (gl.powerUp && gl.pressed){
-/*
-if ((puck.pos[1] - puck.w) < (gl.p1[1] + gl.p1[0]) &&
-		puck.pos[1] > (gl.p1[1] - gl.p1[0]) &&
-		puck.pos[0] > (gl.p1[0] - gl.p1[1]) &&
-		puck.pos[0] < (gl.p1[0] + gl.p1[1])) {
-*/
+
 //if power up (p1) makes contact with puck
 //(if distance between them is less that n pixels)
-if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize && (abs(puck.pos[0] - gl.p1[0]) < gl.pUpSize)){
+if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize && 
+   (abs(puck.pos[0] - gl.p1[0]) < gl.pUpSize)){
 			//printf("\ncontact\n");
 			gl.powerUp = 0;
+			*puck.vel = speedUp(puck.vel);
 			//cout << gl.p1[0] << " " << gl.p1[1];
 		}
 }
@@ -601,6 +604,8 @@ if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize && (abs(puck.pos[0] - gl.p1[0]) < g
 		}
 	    }
 	}
+	
+
 	ai_paddle_physics(puck.pos[0], puck.pos[1], puck.w, puck.vel[1], gl.yres);	
 
 	if (gl.bricks_feature) {
@@ -622,6 +627,12 @@ if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize && (abs(puck.pos[0] - gl.p1[0]) < g
 		gl.pressed = 0;
 	}
     }
+		if (puck.vel[0] > gl.speedCap){
+		puck.vel[0] = gl.speedCap;
+	}
+		if (puck.vel[1] > gl.speedCap){
+		puck.vel[1] = gl.speedCap;
+	}
 }
 
 void render()
@@ -650,7 +661,8 @@ void render()
     if (!gl.pressed) {
 	ggprint8b(&r, 16, 0x00ff0000, "PRESS SPACE TO START");
 	ggprint8b(&r, 16, 0x00ff0000, "F12 - START/STOP BRICK FEATURE MODE");
-	ggprint8b(&r, 20, 0x00ff0000, "PRESS Q TO CHANGE PADDLE/PUCK SHAPE");
+	ggprint8b(&r, 20, 0x00ff0000, "PRESS X TO SPAWN POWER UP");
+	ggprint8b(&r, 20, 0x00ff0000, "PRESS R TO RESET");
     }
     // Draw paddle
     glPushMatrix();

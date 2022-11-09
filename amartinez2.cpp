@@ -78,3 +78,11 @@ extern void drawPowerUps(float* p1, int sz)
 	glVertex2i(p1[0]+sz, p1[1]-sz);
 	glEnd();
 }
+
+extern float speedUp(float* vel)
+{
+	vel[0] *= 2.0;
+	vel[1] *= 2.0;
+	return *vel;
+
+}
