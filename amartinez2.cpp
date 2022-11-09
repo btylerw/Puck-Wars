@@ -67,14 +67,14 @@ extern void draw_circle(float cx, float cy, float radius, int segs)
     glEnd();
 
 }
-
-extern void drawPowerUps(float* p1)
+// p1 is vector, sz is size in pixels
+extern void drawPowerUps(float* p1, int sz)
 {
 	glColor3f(1.0,0.0,0);
 	glBegin(GL_QUADS);
-	glVertex2i(p1[0]-20, p1[1]-20);
-	glVertex2i(p1[0]-20, p1[1]+20);
-	glVertex2i(p1[0]+20, p1[1]+20);
-	glVertex2i(p1[0]+20, p1[1]-20);
+	glVertex2i(p1[0]-sz, p1[1]-sz);
+	glVertex2i(p1[0]-sz, p1[1]+sz);
+	glVertex2i(p1[0]+sz, p1[1]+sz);
+	glVertex2i(p1[0]+sz, p1[1]-sz);
 	glEnd();
 }

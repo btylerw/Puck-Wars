@@ -25,11 +25,12 @@ using namespace std;
 #include "abotello.h"
 #include "avu2.h"
 #include "amartinez2.h"
+
+
+typedef float pUpVec[3]; //power up vector
 //some structures
 
 // Define some global variables
-typedef float pUpVec[3]; //power up vector
-
 class Global {
     public:
 	int xres, yres;
@@ -48,7 +49,7 @@ class Global {
 	int ai_score;
 	bool firstTime;
 	pUpVec p1, p2; //points for power up location
-
+	int pUpSize;
 	Global()
 	{
 	    xres = 600;
@@ -67,6 +68,7 @@ class Global {
 	    cheat = 0;
 		circleShape = 0;
 		powerUp = 0;
+		pUpSize = 35;
 		firstTime = true;
 
 	}
@@ -185,7 +187,7 @@ class X11_wrapper {
 void init_opengl(void);
 void physics(void);
 void render(void);
-void draw_circle(float cx, float cy, float radius, int segs);
+//void draw_circle(float cx, float cy, float radius, int segs);
 
 
 //=====================================
@@ -403,9 +405,13 @@ int X11_wrapper::check_keys(XEvent *e)
 		gl.powerUp ^= 1;
 		if(gl.powerUp == 1)
 			//random points on screen
+			//x axis
 			gl.p1[0] = rand() % gl.xres;
+			//y axis
 			gl.p1[1] = rand() % gl.yres;
+
 			//gl.powerUp = 0;
+
 		break;
 	}
     }
@@ -544,7 +550,21 @@ void physics()
 	    //gl.pressed = 0;
 	    //reset();
 	}
-
+if (gl.powerUp && gl.pressed){
+/*
+if ((puck.pos[1] - puck.w) < (gl.p1[1] + gl.p1[0]) &&
+		puck.pos[1] > (gl.p1[1] - gl.p1[0]) &&
+		puck.pos[0] > (gl.p1[0] - gl.p1[1]) &&
+		puck.pos[0] < (gl.p1[0] + gl.p1[1])) {
+*/
+//if power up (p1) makes contact with puck
+//(if distance between them is less that n pixels)
+if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize && (abs(puck.pos[0] - gl.p1[0]) < gl.pUpSize)){
+			//printf("\ncontact\n");
+			gl.powerUp = 0;
+			//cout << gl.p1[0] << " " << gl.p1[1];
+		}
+}
 	// Check for puck/paddle collision
 	// Adds paddle velocity to puck velocity
 	if ((puck.pos[1] - puck.w) < (paddle.pos[1] + paddle.h) &&
@@ -700,6 +720,7 @@ void render()
 	ggprint16(&r, 0, 0x0088aaff, "Tyler, Andres, Aldair, Anh, Abisai");
     }
 	if(gl.powerUp) {
-		drawPowerUps(gl.p1);
+		//pass in vector and size of power up
+		drawPowerUps(gl.p1, gl.pUpSize);
 	}
 }
