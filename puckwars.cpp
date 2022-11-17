@@ -51,8 +51,10 @@ class Global {
 	pUpVec p1, p2; //points for power up location
 	int pUpSize;
 	int speedCap;
+	int pressButton;
 	Global()
 	{
+		pressButton = 0;
 	    xres = 600;
 	    yres = 1200;
 	    pressed = 0;
@@ -323,11 +325,13 @@ void X11_wrapper::check_mouse(XEvent *e)
     }
     //
     if (e->type == ButtonRelease) {
+		gl.pressButton = 0;
 	return;
     }
     if (e->type == ButtonPress) {
 	while (e->xbutton.button==1) {
 	    //Left button was pressed.
+	    gl.pressButton = 1;
 	    return;
 	}
 	if (e->xbutton.button==3) {
@@ -716,12 +720,38 @@ void render()
 	ggprint16(&r, 0, 0x0088aaff, "To activate your cheat code: ");
 	r.bot = gl.yres/2 -50;
 	ggprint16(&r, 0, 0x0088aaff, "Pressing f");
-
-    }
+	}
+    //if (gl.pressButton == 1)
+    //    cheatMotion(gl.xres, gl.yres, gl.mouse_x, gl.mouse_y);
+    //}
     if (gl.feature != 0) {
 	showCheat(gl.xres, gl.yres);
-	r.bot = gl.yres - 120;
+	r.bot = gl.yres - 180;
 	ggprint16(&r, 0, 0x0088aaff, "Cheat Time");
+	//Printing numbers for cheat sheet
+    	r.bot = gl.yres/2 + 160;
+    	r.left = gl.xres/2 - 80;
+    	ggprint16(&r, 0, 0x0088aaff, "1");
+   	 r.left = gl.xres/2;
+    	ggprint16(&r, 0, 0x0088aaff, "2");
+    	r.left = gl.xres/2 + 80;
+    	ggprint16(&r, 0, 0x0088aaff, "3");
+    	r.bot = gl.yres/2 + 80;
+   	ggprint16(&r, 0, 0x0088aaff, "6" );
+   	r.bot = gl.yres/2;
+    	ggprint16(&r, 0, 0x0088aaff, "9" );
+    	r.left = gl.xres/2;
+    	ggprint16(&r, 0, 0x0088aaff, "8" );
+    	r.left = gl.xres/2 - 80;
+    	ggprint16(&r, 0, 0x0088aaff, "7" );
+    	r.bot = gl.yres/2 + 80;
+    	ggprint16(&r, 0, 0x0088aaff, "4" );
+    	r.left = gl.xres/2;
+    	ggprint16(&r, 0, 0x0088aaff, "5" );
+    	////////////////////////////////////
+	if (gl.pressButton == 1) {
+		cheatMotion(gl.xres, gl.yres, gl.mouse_x, gl.mouse_y);
+	}		
 
     }
     if (gl.credit != 0) {

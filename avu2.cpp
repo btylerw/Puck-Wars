@@ -8,6 +8,7 @@
 #include <math.h>
 #include <iostream>
 #include <cstdlib>
+#include <GL/glut.h>
 
 //std::string credit_html =
 //#include "credit.html";
@@ -70,21 +71,6 @@ extern void drawCheatCode(int xres, int yres) {
     glDisable(GL_BLEND);
 }
 
-//passcode
-//stil working on this one  <<<-----------
-void drawCodeBox(int xres, int yres) {
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-    glColor3f(1.0, 1.0, 0.0);
-    glColor4f(4.0, 4.0, 4.0, 0.5);
-    int w = 400;
-    glBegin(GL_TRIANGLE_STRIP);
-    glVertex2i(0+w   , w);
-    glVertex2i(xres-w, w);
-    glEnd();
-    glDisable(GL_BLEND);
-
-}
 //////////////////////////////////////////
 void drawCircle(int x, int y, GLfloat xcenter, GLfloat ycenter) {
     int i;
@@ -100,24 +86,68 @@ void drawCircle(int x, int y, GLfloat xcenter, GLfloat ycenter) {
     }
     glEnd();
 }
-
-void allCircle(int xres, int yres) {
-    //red
-    glColor3f(1.0f, 0.0f, 0.0f);
-    drawCircle(xres/2, yres/2 + 80, 30, 30);
-    drawCircle(xres/2 - 80, yres/2 +80, 30, 30);
-    drawCircle(xres/2 + 80, yres/2 +80, 30, 30);
+void greenCircle(int xres, int yres) {
     //green
     glColor3f(0.0f, 1.0f, 0.0f);
     drawCircle(xres/2 - 80, yres/2 + 160, 30, 30);
     drawCircle(xres/2 + 80, yres/2 + 160, 30, 30);
     drawCircle(xres/2, yres/2 + 160, 30, 30);
+}
+void redCircle(int xres, int yres) {
+    //red
+    glColor3f(1.0f, 0.0f, 0.0f);
+    drawCircle(xres/2, yres/2 + 80, 30, 30);
+    drawCircle(xres/2 - 80, yres/2 +80, 30, 30);
+    drawCircle(xres/2 + 80, yres/2 +80, 30, 30);
+}
+void blueCircle(int xres, int yres) {
     //blue
     glColor3f(0.0f, 0.0f, 1.0f);
     drawCircle(xres/2 + 80, yres/2, 30, 30); 
     drawCircle(xres/2 - 80, yres/2, 30, 30);
     drawCircle(xres/2, yres/2, 30, 30);
 }
+
+void cheatMotion(int xres, int yres, int x, int y) {
+        //blue
+    if (y = yres/2) {
+        glColor3f(0.0f, 0.0f, 1.0f);
+        if (x = xres/2) {
+            drawCircle(xres/2, yres/2, 30, 30);
+        }
+        if (x = xres/2 - 80) {
+            drawCircle(xres/2 - 80, yres/2, 30,30);
+        }
+        if (x = xres/2 + 80) {
+            drawCircle(xres/2 + 80, yres/2, 30, 30);
+        }
+    }
+        //green
+    if (y = yres/2 + 160)
+        glColor3f(0.0f, 1.0f, 0.0f);
+        if (x = xres/2) {
+            drawCircle(xres/2, yres/2 + 160, 30, 30);
+        }
+        if (x = xres/2 - 80) {
+            drawCircle(xres/2 - 80, yres/2 + 160, 30,30);
+        }
+        if (x = xres/2 + 80) {
+            drawCircle(xres/2 + 80, yres/2 + 160, 30, 30);
+        }
+        //red
+    if (y = yres/2 + 80)
+    glColor3f(1.0f, 0.0f, 0.0f);
+        if (x = xres/2) {
+            drawCircle(xres/2, yres/2 + 80, 30, 30);
+        }
+        if (x = xres/2 - 80) {
+            drawCircle(xres/2 - 80, yres/2 + 80, 30,30);
+        }
+        if (x = xres/2 + 80) {
+            drawCircle(xres/2 + 80, yres/2 + 80, 30, 30);
+        }
+}
+
 //function call
 void showCheat(int xres, int yres) {
     float r = 4;
@@ -127,12 +157,12 @@ void showCheat(int xres, int yres) {
     b = rand() % 10;
     showFeature(xres, yres);
     drawCheatCode(xres, yres);
-    drawCodeBox(xres, yres);
+    greenCircle(xres, yres);
+    redCircle(xres, yres);
+    blueCircle(xres, yres);
     /*for (int i = 0; i < 10; i++) {
       drawCircle(xres/2, yres/2 + 5*b*i, 30, 30);
       }*/
-    allCircle(xres, yres);
-
 }
 
 
