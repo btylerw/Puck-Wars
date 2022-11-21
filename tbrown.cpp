@@ -161,6 +161,16 @@ extern void draw_bricks()
 			glVertex2f(bricks[i].w, -bricks[i].h);
 		glEnd();
 		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(255, 255, 255);
+		glTranslatef(bricks[i].pos[0], bricks[i].pos[1], 0.0f);
+		glBegin(GL_LINE_LOOP);
+			glVertex2f(-bricks[i].w, -bricks[i].h);
+			glVertex2f(-bricks[i].w, bricks[i].h);
+			glVertex2f(bricks[i].w, bricks[i].h);
+			glVertex2f(bricks[i].w, -bricks[i].h);
+		glEnd();
+		glPopMatrix();
 	}
     glPushMatrix();
     glColor3ub(100, 200, 100);
