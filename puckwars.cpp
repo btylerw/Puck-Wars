@@ -405,6 +405,15 @@ int X11_wrapper::check_keys(XEvent *e)
 	    case XK_i:
 		gl.intro_screen = !gl.intro_screen;
 		break;
+		case XK_F9:
+		set_difficulty(0);
+		break;
+		case XK_F10:
+		set_difficulty(1);
+		break;
+		case XK_F11:
+		set_difficulty(2);
+		break;	
 	    case XK_F12:
 		gl.bricks_feature = !gl.bricks_feature;
 		break;

@@ -6,6 +6,13 @@
 #include <cstdlib>
 #include <cmath>
 // Renders intro screen
+
+int difficulty = 0;
+
+extern void set_difficulty(int a)
+{
+	difficulty = a;
+}
 extern void show_intro_screen(GLuint introTexture, int xres, int yres)
 {
         glBindTexture(GL_TEXTURE_2D, introTexture);
@@ -41,6 +48,8 @@ class Bricks {
 		float old_x;
 		float pos[2];
 		float vel[2];
+		float ai_return;
+		float player_return;
 		Bricks() {
 			h = 12.0f;
 			w = 60.0f;
@@ -48,6 +57,8 @@ class Bricks {
 			pos[1] = y = 0.0;
 			vel[0] = vel[1] = 0;
 			old_x = 0;
+			ai_return = pos[1];
+			player_return = pos[1];
 		}
 };
 
@@ -68,23 +79,6 @@ extern void set_goals(int x, int y)
 	goals[1].pos[1] = y - goals[0].h;
 }
 
-// Picks random brick to move
-// If brick is on left side of screen, moves right
-// If brick is on right side of screen, moves left
-extern int change_brick_vel(int i, float pos)
-{
-	srand(time(NULL));
-	int selection = rand() % 19 + 1;
-
-	if (i < 10 && i == selection) {
-		return 10;
-	}
-	else if (i >= 10 && i == selection) {
-		return -10;
-	}
-	else
-		return 0;
-}
 
 // Default everything
 extern void reset_brick_pos(int xres)
@@ -121,6 +115,7 @@ extern void make_bricks(int x, int y)
 	ai_paddle.pos[0] = x/2.0;
 	ai_paddle.pos[1] = y/1.1;
 	ai_paddle.old_x = x/2.0;
+	ai_paddle.ai_return = ai_paddle.pos[1];
 }
 
 // Check for collision with puck. Needs more work to check underside collision
@@ -151,6 +146,7 @@ extern void check_brick_hit(float &puckw, float &puckpos0, float &puckpos1, floa
 extern void draw_bricks()
 {
 	for (int i = 0; i < 20; i++) {
+		// Fill obstacle color
 		glPushMatrix();
 		glColor3ub(0, 0, 0);
 		glTranslatef(bricks[i].pos[0], bricks[i].pos[1], 0.0f);
@@ -161,6 +157,7 @@ extern void draw_bricks()
 			glVertex2f(bricks[i].w, -bricks[i].h);
 		glEnd();
 		glPopMatrix();
+		// Make line border for obstacles
 		glPushMatrix();
 		glColor3ub(255, 255, 255);
 		glTranslatef(bricks[i].pos[0], bricks[i].pos[1], 0.0f);
@@ -197,9 +194,18 @@ extern void draw_bricks()
 
 // Updates brick positions, will probably be combined with change_brick_vel() in future
 extern void move_bricks()
-{
+{	
+	srand(time(NULL));
 	for (int i = 0; i < 20; i++) {
-		bricks[i].pos[0] += change_brick_vel(i, bricks[i].pos[0]);
+		int selection = rand() % 19 + 1;
+
+		if (i < 10 && i == selection) {
+			bricks[i].pos[0]+=10;
+		}
+		else if (i >= 10 && i == selection) {
+			bricks[i].pos[0]+=-10;
+		}
+		//bricks[i].pos[0] += change_brick_vel(i, bricks[i].pos[0]);
 		if (bricks[i].pos[0] > (600 + bricks[i].w) || bricks[i].pos[0] < -bricks[i].w) {
 			if (i < 10)
 				bricks[i].pos[0] = -bricks[i].w;
@@ -239,7 +245,17 @@ extern int check_ai_goal(float puckpos0, float puckpos1, float puckw)
 // AI paddle tracks puck location, moves back to center if not coming towards it's side
 extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float &puckvel1, int y)
 {
+	int speed = 0;
+	switch (difficulty) {
+		case 0:	speed = 2;
+				break;
+		case 1: speed = 5;
+				break;
+		case 2: speed = 8;
+				break;
+	}
 	ai_paddle.pos[0] += ai_paddle.vel[0];
+	ai_paddle.pos[1] += ai_paddle.vel[1];
 	if ((puckpos1 - puckw) < (ai_paddle.pos[1] + ai_paddle.h) &&
         puckpos1 > (ai_paddle.pos[1] - ai_paddle.h) &&
         puckpos0 > (ai_paddle.pos[0] - ai_paddle.w) &&
@@ -248,18 +264,22 @@ extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float
 		}
 
 	if (puckpos1 > y / 2 && puckvel1 > 0) {
-		if (puckpos0 > ai_paddle.pos[0])
-			ai_paddle.vel[0] = 5;
-		else if (puckpos0 < ai_paddle.pos[0])
-			ai_paddle.vel[0] = -5;
+		if (puckpos0 > ai_paddle.pos[0] + ai_paddle.w) {
+			ai_paddle.vel[0] = speed;
+		}
+		else if (puckpos0 < ai_paddle.pos[0] - ai_paddle.w) {
+			ai_paddle.vel[0] = -speed;
+		}
+		if (puckpos1 < ai_paddle.pos[1]) {
+			ai_paddle.vel[1] = -speed;
+		}
 	}
-// Commented out for difficulty testing
-//	else if (ai_paddle.pos[0] < ai_paddle.old_x) {
-//		ai_paddle.vel[0] = 3;
-//	}
-//	else if (ai_paddle.pos[0] > ai_paddle.old_x) {
-//		ai_paddle.vel[0] = -3;
-//	}
-	else
+	else if (ai_paddle.pos[1] < ai_paddle.ai_return) {
+		ai_paddle.vel[1] = speed;
 		ai_paddle.vel[0] = 0;
+	}
+	else {
+		ai_paddle.vel[0] = 0;
+		ai_paddle.vel[1] = 0;
+	}
 }
