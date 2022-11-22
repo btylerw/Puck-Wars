@@ -1,6 +1,8 @@
 // Header file for Tyler Brown
 
 extern void set_difficulty(int a);
+extern int check_autoplay();
+extern void set_autoplay(int a);
 extern void show_intro_screen(GLuint introTexture, int xres, int yres);
 extern void show_background(GLuint backgroundTexture, int xres, int yres);
 extern void reset_brick_pos(int xres);
@@ -12,4 +14,4 @@ extern void move_bricks();
 extern void set_goals(int x, int y);
 extern int check_player_goal(float puckpos0, float puckpos1, float puckw);
 extern int check_ai_goal(float puckpos0, float puckpos1, float puckw);
-extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float &puckvel1, int y);
+extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float &puckvel1, float &puckvel0, int y);

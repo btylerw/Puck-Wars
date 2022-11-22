@@ -8,10 +8,21 @@
 // Renders intro screen
 
 int difficulty = 0;
+int autoplay = 0;
 
 extern void set_difficulty(int a)
 {
 	difficulty = a;
+}
+
+extern int check_autoplay()
+{
+	return autoplay;
+}
+
+extern void set_autoplay(int a)
+{
+	autoplay = a;
 }
 extern void show_intro_screen(GLuint introTexture, int xres, int yres)
 {
@@ -49,7 +60,9 @@ class Bricks {
 		float pos[2];
 		float vel[2];
 		float ai_return;
-		float player_return;
+		float auto_return;
+		float old_y;
+		float force;
 		Bricks() {
 			h = 12.0f;
 			w = 60.0f;
@@ -57,8 +70,10 @@ class Bricks {
 			pos[1] = y = 0.0;
 			vel[0] = vel[1] = 0;
 			old_x = 0;
+			old_y = 0;
+			force = 0;
 			ai_return = pos[1];
-			player_return = pos[1];
+			auto_return = pos[1];
 		}
 };
 
@@ -66,6 +81,7 @@ class Bricks {
 Bricks bricks[20];
 Bricks goals[2];
 Bricks ai_paddle;
+Bricks autoplay_paddle;
 
 extern void set_goals(int x, int y)
 {
@@ -115,7 +131,14 @@ extern void make_bricks(int x, int y)
 	ai_paddle.pos[0] = x/2.0;
 	ai_paddle.pos[1] = y/1.1;
 	ai_paddle.old_x = x/2.0;
+	ai_paddle.old_y = y/1.1;
 	ai_paddle.ai_return = ai_paddle.pos[1];
+	autoplay_paddle.w = 30.0f;
+	autoplay_paddle.pos[0] = x/2.0;
+	autoplay_paddle.pos[1] = y/10.0;
+	autoplay_paddle.old_x = x/2.0;
+	autoplay_paddle.old_y = y/10.0;
+	autoplay_paddle.auto_return = autoplay_paddle.pos[1];
 }
 
 // Check for collision with puck. Needs more work to check underside collision
@@ -171,16 +194,7 @@ extern void draw_bricks()
 	}
     glPushMatrix();
     glColor3ub(100, 200, 100);
-	/*
-    glTranslatef(ai_paddle.pos[0], ai_paddle.pos[1], 0.0f);
-    glBegin(GL_QUADS);
-	    glVertex2f(-ai_paddle.w, -ai_paddle.h);
-        glVertex2f(-ai_paddle.w, ai_paddle.h);
-        glVertex2f(ai_paddle.w, ai_paddle.h);
-        glVertex2f(ai_paddle.w, -ai_paddle.h);
-    glEnd();
-    glPopMatrix();
-    */
+
 	glBegin(GL_TRIANGLE_FAN);
 	for (int i = 0; i < 360; i++) {
 		float theta = 3.1415926 * 2 * i / 360.0;
@@ -190,6 +204,17 @@ extern void draw_bricks()
 	}
 	glEnd();
 
+	if (autoplay) {
+		glColor3ub(100, 100, 200);
+		glBegin(GL_TRIANGLE_FAN);
+		for (int i = 0; i < 360; i++) {
+			float theta = 3.1415926 * 2 * i / 360.0;
+			float x = 30.0 * cosf(theta);
+			float y = 30.0 * sinf(theta);
+			glVertex2f(x + autoplay_paddle.pos[0], y + autoplay_paddle.pos[1]);
+		}
+		glEnd();
+	}
 }
 
 // Updates brick positions, will probably be combined with change_brick_vel() in future
@@ -243,7 +268,7 @@ extern int check_ai_goal(float puckpos0, float puckpos1, float puckw)
 }
 
 // AI paddle tracks puck location, moves back to center if not coming towards it's side
-extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float &puckvel1, int y)
+extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float &puckvel1, float &puckvel0, int y)
 {
 	int speed = 0;
 	switch (difficulty) {
@@ -260,7 +285,11 @@ extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float
         puckpos1 > (ai_paddle.pos[1] - ai_paddle.h) &&
         puckpos0 > (ai_paddle.pos[0] - ai_paddle.w) &&
         puckpos0 < (ai_paddle.pos[0] + ai_paddle.w)) {
-			puckvel1 = -puckvel1;
+			if (puckpos0 < ai_paddle.pos[0])
+				puckvel0 = -2;
+			else if (puckpos0 > ai_paddle.pos[0])
+				puckvel0 = 2;
+			puckvel1 = -puckvel1 - 5;
 		}
 
 	if (puckpos1 > y / 2 && puckvel1 > 0) {
@@ -281,5 +310,41 @@ extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float
 	else {
 		ai_paddle.vel[0] = 0;
 		ai_paddle.vel[1] = 0;
+	}
+
+	if (autoplay) {
+
+		autoplay_paddle.pos[0] += autoplay_paddle.vel[0];
+		autoplay_paddle.pos[1] += autoplay_paddle.vel[1];
+		if ((puckpos1 - puckw) < (autoplay_paddle.pos[1] + autoplay_paddle.h) &&
+        	puckpos1 > (autoplay_paddle.pos[1] - autoplay_paddle.h) &&
+        	puckpos0 > (autoplay_paddle.pos[0] - autoplay_paddle.w) &&
+        	puckpos0 < (autoplay_paddle.pos[0] + autoplay_paddle.w)) {
+				if (puckpos0 < autoplay_paddle.pos[0])
+					puckvel0 = -2;
+				else if (puckpos0 > autoplay_paddle.pos[0])
+					puckvel0 = 2;
+				puckvel1 = -puckvel1 + 5;
+			}
+
+		if (puckpos1 < y / 2 && puckvel1 < 0) {
+			if (puckpos0 > autoplay_paddle.pos[0] + autoplay_paddle.w) {
+				autoplay_paddle.vel[0] = speed;
+			}
+			else if (puckpos0 < autoplay_paddle.pos[0] - autoplay_paddle.w) {
+				autoplay_paddle.vel[0] = -speed;
+			}
+			if (puckpos1 > autoplay_paddle.pos[1]) {
+				autoplay_paddle.vel[1] = speed;
+			}
+		}
+		else if (autoplay_paddle.pos[1] > autoplay_paddle.auto_return) {
+			autoplay_paddle.vel[1] = -speed;
+			autoplay_paddle.vel[0] = 0;
+		}
+		else {
+			autoplay_paddle.vel[0] = 0;
+			autoplay_paddle.vel[1] = 0;
+		}
 	}
 }

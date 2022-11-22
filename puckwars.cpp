@@ -390,48 +390,51 @@ int X11_wrapper::check_keys(XEvent *e)
 			reset();
 			gl.pressed = 0;
 		break;
+		case XK_a:
+			set_autoplay(!check_autoplay());
+			break;
 	    case XK_c:
-		gl.credit += 1;
-		if (gl.credit > 1) {
-		    gl.credit = 0;
-		}
-		break;
+			gl.credit += 1;
+			if (gl.credit > 1) {
+		    	gl.credit = 0;
+			}
+			break;
 	    case XK_f:
-		gl.feature += 1;
-		if (gl.feature > 1) {
-		    gl.feature = 0;
-		}
-		break;
+			gl.feature += 1;
+			if (gl.feature > 1) {
+		    	gl.feature = 0;
+			}
+			break;
 	    case XK_i:
-		gl.intro_screen = !gl.intro_screen;
-		break;
+			gl.intro_screen = !gl.intro_screen;
+			break;
 		case XK_F9:
-		set_difficulty(0);
-		break;
+			set_difficulty(0);
+			break;
 		case XK_F10:
-		set_difficulty(1);
-		break;
+			set_difficulty(1);
+			break;
 		case XK_F11:
-		set_difficulty(2);
-		break;	
+			set_difficulty(2);
+			break;	
 	    case XK_F12:
-		gl.bricks_feature = !gl.bricks_feature;
-		break;
+			gl.bricks_feature = !gl.bricks_feature;
+			break;
 		case XK_q:
-		gl.circleShape ^= 1;
-		break;
+			gl.circleShape ^= 1;
+			break;
 		case XK_x:
-		gl.powerUp ^= 1;
-		if(gl.powerUp == 1)
-			//random points on screen
-			//x axis
-			gl.p1[0] = ((rand() % gl.xres) * 0.75) + (gl.xres * 0.17);
-			//y axis
-			gl.p1[1] = ((rand() % gl.yres) * 0.7) + (gl.yres * 0.2);
+			gl.powerUp ^= 1;
+			if(gl.powerUp == 1)
+				//random points on screen
+				//x axis
+				gl.p1[0] = ((rand() % gl.xres) * 0.75) + (gl.xres * 0.17);
+				//y axis
+				gl.p1[1] = ((rand() % gl.yres) * 0.7) + (gl.yres * 0.2);
 
-			//gl.powerUp = 0;
+				//gl.powerUp = 0;
 
-		break;
+			break;
 	}
     }
     return 0;
@@ -583,6 +586,7 @@ if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize &&
 }
 	// Check for puck/paddle collision
 	// Adds paddle velocity to puck velocity
+if (!check_autoplay()) {
 	if ((puck.pos[1] - puck.w) < (paddle.pos[1] + paddle.h) &&
 		puck.pos[1] > (paddle.pos[1] - paddle.h) &&
 		puck.pos[0] > (paddle.pos[0] - paddle.w) &&
@@ -617,9 +621,10 @@ if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize &&
 		}
 	    }
 	}
+}
 	
 
-	ai_paddle_physics(puck.pos[0], puck.pos[1], puck.w, puck.vel[1], gl.yres);	
+	ai_paddle_physics(puck.pos[0], puck.pos[1], puck.w, puck.vel[1], puck.vel[0], gl.yres);	
 
 	if (gl.bricks_feature) {
 	    move_bricks();
@@ -663,11 +668,11 @@ void render()
     // Render background
     show_background(backgroundTexture, gl.xres, gl.yres);
     // Define positions for instruction text
-	r.bot = gl.yres - 40;
+	r.bot = gl.yres - 45;
 	r.left = 30;
 	r.center = 0;
-	ggprint8b(&r, 16, 0x000000ff, "Your Score: 	%d", gl.player_score);
-	ggprint8b(&r, 16, 0x000000ff, "AI Score:	%d", gl.ai_score);
+	ggprint16(&r, 20, 0x0088aaff, "Your Score: 	%d", gl.player_score);
+	ggprint16(&r, 16, 0x0088aaff, "AI Score:	%d", gl.ai_score);
     r.bot = gl.yres/1.5;
     r.left = gl.xres/2;
     r.center = -5;
@@ -678,21 +683,23 @@ void render()
 	ggprint8b(&r, 20, 0x00ff0000, "PRESS R TO RESET");
     }
     // Draw paddle
-    glPushMatrix();
-    glColor3ub(100, 200, 100);
-	if (gl.circleShape){
-		draw_circle(paddle.pos[0], paddle.pos[1], 30.0, 360);
-	}
-	else {
-    	glTranslatef(paddle.pos[0], paddle.pos[1], 0.0f);
-    	glBegin(GL_QUADS);
-    	glVertex2f(-paddle.w, -paddle.h);
-    	glVertex2f(-paddle.w,  paddle.h);
-    	glVertex2f(paddle.w, paddle.h);
-   		glVertex2f(paddle.w, -paddle.h);
-		glEnd();
-	}
-    glPopMatrix();
+   if (!check_autoplay()) { 
+    	glPushMatrix();
+    	glColor3ub(100, 200, 100);
+		if (gl.circleShape){
+			draw_circle(paddle.pos[0], paddle.pos[1], 30.0, 360);
+		}
+		else {
+    		glTranslatef(paddle.pos[0], paddle.pos[1], 0.0f);
+    		glBegin(GL_QUADS);
+    		glVertex2f(-paddle.w, -paddle.h);
+    		glVertex2f(-paddle.w,  paddle.h);
+    		glVertex2f(paddle.w, paddle.h);
+   			glVertex2f(paddle.w, -paddle.h);
+			glEnd();
+		}
+    	glPopMatrix();
+   }
     // Draw puck
     glPushMatrix();
     glColor3ub(150, 160, 220);
@@ -726,9 +733,10 @@ void render()
     if (gl.help_screen) {
 	help_screen(helpTexture, gl.xres, gl.yres);
 	r.bot = gl.yres/2;
-	ggprint16(&r, 0, 0x0088aaff, "To activate your cheat code: ");
-	r.bot = gl.yres/2 -50;
-	ggprint16(&r, 0, 0x0088aaff, "Pressing f");
+	ggprint16(&r, 20, 0x0088aaff, "To activate your cheat code: ");
+	ggprint16(&r, 20, 0x0088aaff, "Pressing f");
+	ggprint16(&r, 20, 0x0088aaff, "F9-F11: Change AI Speed");
+	ggprint16(&r, 0, 0x0088aaff, "A: Activate Autoplay");
 	}
     //if (gl.pressButton == 1)
     //    cheatMotion(gl.xres, gl.yres, gl.mouse_x, gl.mouse_y);
