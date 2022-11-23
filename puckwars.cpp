@@ -48,10 +48,13 @@ class Global {
 	int player_score;
 	int ai_score;
 	bool firstTime;
+	int plusP;
 	pUpVec p1, p2; //points for power up location
 	int pUpSize;
 	int speedCap;
 	int pressButton;
+	int del;
+	int enter;
 	Global()
 	{
 		pressButton = 0;
@@ -64,6 +67,9 @@ class Global {
 	    intro_screen = 1;
 	    credit = 0;
 	    feature = 0;
+	    del = 0;
+	    plusP = 0;
+	    enter = 0;
 	    help_screen = 0;
 	    bricks_feature = 0;
 	    player_score = 0;
@@ -380,6 +386,19 @@ int X11_wrapper::check_keys(XEvent *e)
 	   // case XK_b:
 		//gl.big = manage_bstate(gl.big);
 		//break;
+	    case XK_KP_Enter:
+		gl.enter += 1;
+		//gl.help_screen = 0;
+		if (gl.enter > 2) {
+			gl.enter = 0;
+		}
+		break;
+	    case XK_Control_L:
+		gl.plusP += 1;
+		if (gl.plusP > 1) {
+		    gl.plusP = 0;
+		}
+		break;
 	    case XK_F1:
 		if (gl.help_screen)
 		    gl.help_screen = 0;
@@ -738,37 +757,74 @@ void render()
 	ggprint16(&r, 20, 0x0088aaff, "F9-F11: Change AI Speed");
 	ggprint16(&r, 0, 0x0088aaff, "A: Activate Autoplay");
 	}
-    //if (gl.pressButton == 1)
-    //    cheatMotion(gl.xres, gl.yres, gl.mouse_x, gl.mouse_y);
-    //}
     if (gl.feature != 0) {
 	showCheat(gl.xres, gl.yres);
-	r.bot = gl.yres - 180;
-	ggprint16(&r, 0, 0x0088aaff, "Cheat Time");
-	//Printing numbers for cheat sheet
-    	r.bot = gl.yres/2 + 160;
-    	r.left = gl.xres/2 - 80;
-    	ggprint16(&r, 0, 0x0088aaff, "1");
-   	 r.left = gl.xres/2;
-    	ggprint16(&r, 0, 0x0088aaff, "2");
-    	r.left = gl.xres/2 + 80;
-    	ggprint16(&r, 0, 0x0088aaff, "3");
-    	r.bot = gl.yres/2 + 80;
-   	ggprint16(&r, 0, 0x0088aaff, "6" );
-   	r.bot = gl.yres/2;
-    	ggprint16(&r, 0, 0x0088aaff, "9" );
-    	r.left = gl.xres/2;
-    	ggprint16(&r, 0, 0x0088aaff, "8" );
-    	r.left = gl.xres/2 - 80;
-    	ggprint16(&r, 0, 0x0088aaff, "7" );
-    	r.bot = gl.yres/2 + 80;
-    	ggprint16(&r, 0, 0x0088aaff, "4" );
-    	r.left = gl.xres/2;
-    	ggprint16(&r, 0, 0x0088aaff, "5" );
-    	////////////////////////////////////
+	gl.pause;
+	gl.help_screen;
+	r.bot = gl.yres - 380;
+	ggprint16(&r, 0, 0x00ff3333, "Cheat Time");
+	r.bot = gl.yres - 700;
+	ggprint16(&r, 0, 0x00ff3333, "Try 123");
+	r.bot = gl.yres - 620;
+	ggprint16(&r, 0, 0x00ff3333, "Left Ctrl to test");
 	if (gl.pressButton == 1) {
-		cheatMotion(gl.xres, gl.yres, gl.mouse_x, gl.mouse_y);
-	}		
+	    gl.del += 1;
+	    if (gl.del > 4) {
+		gl.del = 0;
+	    }
+	} 
+	int x1, x2, x3;
+	r.bot = gl.yres/2 + 160;    
+    	r.left = gl.xres/2 - 80;
+   	if (gl.enter == 0) {
+	if (gl.del == 1) {
+            ggprint16(&r, 0, 0x0088aaff, "1");
+        }
+        if (gl.del == 2) {
+            ggprint16(&r, 0, 0x0088aaff, "2");
+        }
+        if (gl.del == 3) {
+            ggprint16(&r, 0, 0x0088aaff, "3");
+        }
+	}
+	x1 = gl.del;
+	///
+	if (gl.enter == 1) {
+	r.left = gl.xres/2;
+	if (gl.del == 1) {
+            ggprint16(&r, 0, 0x0088aaff, "1");
+        }
+        if (gl.del == 2) {
+            ggprint16(&r, 0, 0x0088aaff, "2");
+        }
+        if (gl.del == 3) {
+            ggprint16(&r, 0, 0x0088aaff, "3");
+        }
+	x2 = gl.del;
+	}
+	if (gl.enter == 2) {
+	r.left = gl.xres/2 + 80;
+        if (gl.del == 1) {
+            ggprint16(&r, 0, 0x0088aaff, "1");
+        }
+        if (gl.del == 2) {
+            ggprint16(&r, 0, 0x0088aaff, "2");
+        }
+        if (gl.del == 3) {
+            ggprint16(&r, 0, 0x0088aaff, "3");
+        }
+	x3 = gl.del;
+        }
+	if (gl.plusP != 0) {
+	    gl.ai_score = 1;
+	}
+	//some cheat codes
+	//code 1: 123
+	//if ((x1 = 1) && (x2 = 2) && (x3 = 3)) {
+	if (x1 = 2, x2 = 2, x3 = 3)	 
+     		gl.player_score = 1;
+	   //gl.player_score += 1;
+	
 
     }
     if (gl.credit != 0) {
