@@ -55,6 +55,7 @@ class Global {
 	int pressButton;
 	int del;
 	int enter;
+	int increaseSZ; //increase size
 	Global()
 	{
 		pressButton = 0;
@@ -78,8 +79,9 @@ class Global {
 		circleShape = 0;
 		powerUp = 0;
 		pUpSize = 40;
-		speedCap = 22;
+		speedCap = 19;
 		firstTime = true;
+		increaseSZ = 1;
 	}
 } gl;
 
@@ -469,6 +471,8 @@ void reset()
     gl.firstTime = true;
 	reset_brick_pos(gl.xres);
 	gl.bricks_feature = 0;
+	gl.powerUp = 0;
+	gl.increaseSZ = 1;
 }
 
 void init_opengl(void)
@@ -591,29 +595,36 @@ void physics()
 	    //gl.pressed = 0;
 	    //reset();
 	}
-if (gl.powerUp && gl.pressed){
 
+if (gl.powerUp && gl.pressed){
 //if power up (p1) makes contact with puck
 //(if distance between them is less that n pixels)
-if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize && 
-   (abs(puck.pos[0] - gl.p1[0]) < gl.pUpSize)){
-			//printf("\ncontact\n");
-			gl.powerUp = 0;
-			*puck.vel = speedUp(puck.vel);
-			//cout << gl.p1[0] << " " << gl.p1[1];
+	if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize && 
+   	(abs(puck.pos[0] - gl.p1[0]) < gl.pUpSize))
+	{
+		if ((rand() % 2) == 0 && gl.increaseSZ == 1)
+		{
+			gl.increaseSZ = 2;
 		}
+		else
+		{
+			*puck.vel = speedUp(puck.vel);
+		}
+			//cout << gl.p1[0] << " " << gl.p1[1];
+		gl.powerUp = 0;
+	}
 }
 	// Check for puck/paddle collision
 	// Adds paddle velocity to puck velocity
 if (!check_autoplay()) {
-	if ((puck.pos[1] - puck.w) < (paddle.pos[1] + paddle.h) &&
-		puck.pos[1] > (paddle.pos[1] - paddle.h) &&
-		puck.pos[0] > (paddle.pos[0] - paddle.w) &&
-		puck.pos[0] < (paddle.pos[0] + paddle.w)) {
+	if ((puck.pos[1] - puck.w) < (paddle.pos[1] + paddle.h * gl.increaseSZ) &&
+		puck.pos[1] > (paddle.pos[1] - paddle.h * gl.increaseSZ) &&
+		puck.pos[0] > (paddle.pos[0] - paddle.w * gl.increaseSZ) &&
+		puck.pos[0] < (paddle.pos[0] + paddle.w * gl.increaseSZ)) {
 	    	gl.firstTime = false;
 	    if (puck.pos[0] > paddle.pos[0]) {
 		puck.vel[1] = 0;
-		puck.pos[1] = paddle.pos[1] + paddle.h;
+		puck.pos[1] = paddle.pos[1] + paddle.h * gl.increaseSZ;
 		puck.vel[1] += paddle.vel[1];
 		puck.vel[0] = 2;
 		if (paddle.vel[1] <= 0)
@@ -622,7 +633,7 @@ if (!check_autoplay()) {
 
 	    else if (puck.pos[0] < paddle.pos[0]) {
 		puck.vel[1] = 0;
-		puck.pos[1] = paddle.pos[1] + paddle.h;
+		puck.pos[1] = paddle.pos[1] + paddle.h * gl.increaseSZ;
 		puck.vel[1] += paddle.vel[1];
 		puck.vel[0] = -2;
 		if (paddle.vel[1] <= 0)
@@ -631,7 +642,7 @@ if (!check_autoplay()) {
 
 	    else {
 		puck.vel[1] = 0;
-		puck.pos[1] = paddle.pos[1] + paddle.h;
+		puck.pos[1] = paddle.pos[1] + paddle.h * gl.increaseSZ;
 		puck.vel[1] += paddle.vel[1];
 		if (paddle.vel[1] <= 0) {
 		    float new_vel = -puck.vel[1] / 3;
@@ -657,13 +668,16 @@ if (!check_autoplay()) {
 	    reset();
 	    gl.player_score++;
 	    gl.pressed = 0;
+		gl.powerUp = 0;
 	}
 	if (check_ai_goal(puck.pos[0], puck.pos[1], puck.w)) {
 		reset();
 		gl.ai_score++;
 		gl.pressed = 0;
+		gl.powerUp = 0;
 	}
     }
+		//set puck speed limit
 		if (puck.vel[0] > gl.speedCap){
 		puck.vel[0] = gl.speedCap;
 	}
@@ -703,18 +717,22 @@ void render()
     }
     // Draw paddle
    if (!check_autoplay()) { 
+		static float h_tmp = paddle.h;
     	glPushMatrix();
     	glColor3ub(100, 200, 100);
+		
 		if (gl.circleShape){
-			draw_circle(paddle.pos[0], paddle.pos[1], 30.0, 360);
+			draw_circle(paddle.pos[0], paddle.pos[1], 30.0 * gl.increaseSZ, 360);
+			paddle.h = paddle.w;
 		}
 		else {
+			paddle.h = h_tmp; //revert to original height (modified by circleShape)
     		glTranslatef(paddle.pos[0], paddle.pos[1], 0.0f);
     		glBegin(GL_QUADS);
-    		glVertex2f(-paddle.w, -paddle.h);
-    		glVertex2f(-paddle.w,  paddle.h);
-    		glVertex2f(paddle.w, paddle.h);
-   			glVertex2f(paddle.w, -paddle.h);
+    		glVertex2f(-paddle.w * gl.increaseSZ, -paddle.h * gl.increaseSZ);
+    		glVertex2f(-paddle.w * gl.increaseSZ,  paddle.h * gl.increaseSZ);
+    		glVertex2f(paddle.w * gl.increaseSZ, paddle.h * gl.increaseSZ);
+   			glVertex2f(paddle.w * gl.increaseSZ, -paddle.h * gl.increaseSZ);
 			glEnd();
 		}
     	glPopMatrix();

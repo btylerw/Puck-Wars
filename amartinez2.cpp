@@ -70,7 +70,7 @@ extern void draw_circle(float cx, float cy, float radius, int segs)
 // p1 is vector, sz is size in pixels
 extern void drawPowerUps(float* p1, int sz)
 {
-	glColor3f(1.0,0.0,0);
+	glColor3f(1.0,1.0,0);
 	glBegin(GL_QUADS);
 	glVertex2i(p1[0]-sz, p1[1]-sz);
 	glVertex2i(p1[0]-sz, p1[1]+sz);
@@ -81,8 +81,8 @@ extern void drawPowerUps(float* p1, int sz)
 
 extern float speedUp(float* vel)
 {
-	vel[0] *= 2.0;
-	vel[1] *= 2.0;
+	vel[0] *= 1.8;
+	vel[1] *= 1.7;
 	return *vel;
 
 }
