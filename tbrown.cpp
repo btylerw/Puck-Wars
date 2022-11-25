@@ -85,10 +85,10 @@ Bricks autoplay_paddle;
 
 extern void set_goals(int x, int y)
 {
-   	goals[0].h = 10.0f;
-	goals[0].w = 95.0f;
-	goals[1].h = 10.0f;
-	goals[1].w = 95.0f;
+   	goals[0].h = 12.0f;
+	goals[0].w = 97.5f;
+	goals[1].h = 12.0f;
+	goals[1].w = 97.5f;
 	goals[0].pos[0] = x / 2;
 	goals[0].pos[1] = goals[0].h;
 	goals[1].pos[0] = x / 2;
@@ -192,6 +192,21 @@ extern void draw_bricks()
 		glEnd();
 		glPopMatrix();
 	}
+	// Uncomment to check goal size
+	/*
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		glColor3ub(255, 255, 255);
+		glTranslatef(goals[i].pos[0], goals[i].pos[1], 0.0f);
+		glBegin(GL_QUADS);
+			glVertex2f(-goals[i].w, -goals[i].h);
+			glVertex2f(-goals[i].w, goals[i].h);
+			glVertex2f(goals[i].w, goals[i].h);
+			glVertex2f(goals[i].w, -goals[i].h);
+		glEnd();
+		glPopMatrix();
+	}
+	*/
     glPushMatrix();
     glColor3ub(100, 200, 100);
 
