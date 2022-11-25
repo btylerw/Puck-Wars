@@ -107,7 +107,7 @@ extern void reset_brick_pos(int xres)
     	}
 
     	else
-			bricks[i].pos[0] = bricks[i].w + xres;
+			bricks[i].pos[0] = bricks[i].w + xres + 1;
 	}
 }
 
@@ -121,10 +121,10 @@ extern void make_bricks(int x, int y)
 		}
 		else if (i == 10) {
 			yres = y - 20;
-			bricks[i].pos[0] = x + bricks[i].w;
+			bricks[i].pos[0] = x + bricks[i].w + 1;
 		}
 		else {
-			bricks[i].pos[0] = x + bricks[i].w;
+			bricks[i].pos[0] = x + bricks[i].w + 1;
 		}
 		bricks[i].pos[1] = yres;
 		yres-=100;
@@ -235,7 +235,7 @@ extern void draw_bricks()
 }
 
 // Updates brick positions
-extern void move_bricks()
+extern void move_bricks(int xres)
 {	
 	srand(time(NULL));
 	int speed = 20;
@@ -263,11 +263,11 @@ extern void move_bricks()
 					bricks[i].pos[0]+=-speed;
 			}
 			//bricks[i].pos[0] += change_brick_vel(i, bricks[i].pos[0]);
-			if (bricks[i].pos[0] > (600 + bricks[i].w) || bricks[i].pos[0] < -bricks[i].w) {
+			if (bricks[i].pos[0] > (xres + 1  + bricks[i].w) || bricks[i].pos[0] < -bricks[i].w) {
 				if (i < 10)
 					bricks[i].pos[0] = -bricks[i].w;
 				else
-					bricks[i].pos[0] = 600 + bricks[i].w;
+					bricks[i].pos[0] = xres + 1 + bricks[i].w;
 				is_timing = 0;
 			}
 		}
