@@ -9,6 +9,8 @@
 
 int difficulty = 0;
 int autoplay = 0;
+int is_timing = 0;
+int timer = 0;
 
 extern void set_difficulty(int a)
 {
@@ -232,25 +234,42 @@ extern void draw_bricks()
 	}
 }
 
-// Updates brick positions, will probably be combined with change_brick_vel() in future
+// Updates brick positions
 extern void move_bricks()
 {	
 	srand(time(NULL));
-	for (int i = 0; i < 20; i++) {
-		int selection = rand() % 19 + 1;
+	int speed = 20;
+	int offset;
+	switch (difficulty) {
+		case 0:	offset = 5;
+				break;
+		case 1:	offset = 3;
+				break;
+		case 2:	offset = 1;
+				break;
+	}
+	if (!is_timing) {
+		timer = (unsigned)time(NULL) + offset;
+		is_timing = 1;
+	}
+	if ((unsigned)time(NULL) >= timer) {
+		for (int i = 0; i < 20; i++) {
+			int selection = rand() % 19 + 1;
 
-		if (i < 10 && i == selection) {
-			bricks[i].pos[0]+=10;
-		}
-		else if (i >= 10 && i == selection) {
-			bricks[i].pos[0]+=-10;
-		}
-		//bricks[i].pos[0] += change_brick_vel(i, bricks[i].pos[0]);
-		if (bricks[i].pos[0] > (600 + bricks[i].w) || bricks[i].pos[0] < -bricks[i].w) {
-			if (i < 10)
-				bricks[i].pos[0] = -bricks[i].w;
-			else
-				bricks[i].pos[0] = 600 + bricks[i].w;
+			if (i < 10 && i == selection) {
+					bricks[i].pos[0]+=speed;
+			}
+			else if (i >= 10 && i == selection) {
+					bricks[i].pos[0]+=-speed;
+			}
+			//bricks[i].pos[0] += change_brick_vel(i, bricks[i].pos[0]);
+			if (bricks[i].pos[0] > (600 + bricks[i].w) || bricks[i].pos[0] < -bricks[i].w) {
+				if (i < 10)
+					bricks[i].pos[0] = -bricks[i].w;
+				else
+					bricks[i].pos[0] = 600 + bricks[i].w;
+				is_timing = 0;
+			}
 		}
 	}
 }

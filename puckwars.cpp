@@ -473,6 +473,7 @@ void reset()
 	gl.bricks_feature = 0;
 	gl.powerUp = 0;
 	gl.increaseSZ = 1;
+	reset_brick_pos(gl.xres);
 }
 
 void init_opengl(void)
@@ -656,11 +657,8 @@ if (!check_autoplay()) {
 
 	ai_paddle_physics(puck.pos[0], puck.pos[1], puck.w, puck.vel[1], puck.vel[0], gl.yres);	
 
-	if (gl.bricks_feature) {
-	    move_bricks();
-	}
-	else {
-	    reset_brick_pos(gl.xres);
+	if (gl.pressed) {
+		move_bricks();
 	}
 
 	check_brick_hit(puck.w, puck.pos[0], puck.pos[1], puck.vel[0], puck.vel[1]);
