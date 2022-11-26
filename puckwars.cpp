@@ -711,7 +711,7 @@ void render()
 	ggprint8b(&r, 16, 0x00ff0000, "PRESS SPACE TO START");
 	ggprint8b(&r, 16, 0x00ff0000, "F12 - START/STOP BRICK FEATURE MODE");
 	ggprint8b(&r, 20, 0x00ff0000, "PRESS X TO SPAWN POWER UP");
-	ggprint8b(&r, 20, 0x00ff0000, "PRESS R TO RESET");
+	ggprint8b(&r, 20, 0x00ff0000, "PRESS F1 for detailed instructions");
     }
     // Draw paddle
    if (!check_autoplay()) { 
