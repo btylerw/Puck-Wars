@@ -768,10 +768,12 @@ void render()
     if (gl.help_screen) {
 	help_screen(helpTexture, gl.xres, gl.yres);
 	r.bot = gl.yres/2;
+	/*
 	ggprint16(&r, 20, 0x0088aaff, "To activate your cheat code: ");
 	ggprint16(&r, 20, 0x0088aaff, "Pressing f");
 	ggprint16(&r, 20, 0x0088aaff, "F9-F11: Change AI Speed");
 	ggprint16(&r, 0, 0x0088aaff, "A: Activate Autoplay");
+	*/
 	}
     if (gl.feature != 0) {
 	showCheat(gl.xres, gl.yres);
