@@ -5,40 +5,108 @@
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
-// Renders intro screen
+#include "fonts.h"
 
-int difficulty = 0;
-int autoplay = 0;
+// Initializing some global variables
+int difficulty = 1;
+int autoplay = 1;
 int is_timing = 0;
 int timer = 0;
+int intro_timing = 0;
+int intro_timer = 0;
+int show_intro = 0;
 
+// Used to change difficulty value
 extern void set_difficulty(int a)
 {
 	difficulty = a;
 }
 
+// Displays difficulty mode when toggled
+extern void show_difficulty(int a, int xres, int yres) 
+{
+	Rect r;
+	r.bot = yres/1.4;
+	r.left = xres/2;
+	r.center = -5;
+	switch(a) {
+		case 0:	ggprint16(&r, 30, 0x8800aaff, "EASY MODE");
+				break;
+		case 1: ggprint16(&r, 30, 0x8800aaff, "NORMAL MODE");
+				break;
+		case 2: ggprint16(&r, 30, 0x8800aaff, "HARD MODE");
+				break;
+	}
+}
+
+// Displays autoplay mode when toggled
+extern void show_autoplay(int a, int xres, int yres)
+{
+	Rect r;
+	r.bot = yres/1.4;
+	r.left = xres/2;
+	r.center = -5;
+	switch(a) {
+		case 0: ggprint16(&r, 30, 0x8800aaff, "AUTOPLAY OFF");
+				break;
+		case 1:	ggprint16(&r, 30, 0x8800aaff, "AUTOPLAY ON");
+				break;
+	}
+}
+// Used to determine whether autoplay is currently active or inactive
 extern int check_autoplay()
 {
 	return autoplay;
 }
 
-extern void set_autoplay(int a)
+// Shows win/lose status
+extern void show_winner(int a, int xres, int yres) 
 {
-	autoplay = a;
+	Rect r;
+	r.bot = yres/1.4;
+	r.left = xres/2;
+	r.center = -5;
+	switch(a) {
+		case 0: ggprint16(&r, 30, 0x8800aaff, "YOU LOSE!");
+				break;
+		case 1: ggprint16(&r, 30, 0x8800aaff, "YOU WIN!");
+				break;
+	}
 }
+// Renders the intro screen
 extern void show_intro_screen(GLuint introTexture, int xres, int yres)
 {
+	Rect r;
+	r.bot = yres / 1.9;
+	r.left = xres/2;
+	r.center = -5;
+	if (!intro_timing) {
+		intro_timer = (unsigned)time(NULL) + 1;
+		intro_timing = 1;
+	}
+	if (intro_timing && (unsigned)time(NULL) >= intro_timer) {
+		show_intro = !show_intro;
+		intro_timing = 0;
+	}
+
+	ggprint16(&r, 70, 0x8800aaff, "PUCK WARS");
+	if (show_intro) {
+		ggprint12(&r, 30, 0x8800aaff, "PRESS ENTER");
+	}
+		/*
         glBindTexture(GL_TEXTURE_2D, introTexture);
         glColor3f(1.0f, 1.0f, 1.0f);
-        glBegin(GL_QUADS);
+		glBegin(GL_QUADS);
             glTexCoord2f(0.0f, 1.0f);   glVertex2i(0,   0);
             glTexCoord2f(0.0f, 0.25f);  glVertex2i(0,   yres);
             glTexCoord2f(1.0f, 0.25f);  glVertex2i(xres, yres);
             glTexCoord2f(1.0f, 1.0f);   glVertex2i(xres, 0);
         glEnd();
         glBindTexture(GL_TEXTURE_2D, 0);
+		*/
 }
 
+// Renders the background
 extern void show_background(GLuint backgroundTexture, int xres, int yres)
 {
         glBindTexture(GL_TEXTURE_2D, backgroundTexture);
@@ -85,6 +153,7 @@ Bricks goals[2];
 Bricks ai_paddle;
 Bricks autoplay_paddle;
 
+// Places invisible bricks to act as goals
 extern void set_goals(int x, int y)
 {
    	goals[0].h = 12.0f;
@@ -143,7 +212,7 @@ extern void make_bricks(int x, int y)
 	autoplay_paddle.auto_return = autoplay_paddle.pos[1];
 }
 
-// Check for collision with puck. Needs more work to check underside collision
+// Check for collision with puck. Reverses puck y-axis velocity when hit
 extern void check_brick_hit(float &puckw, float &puckpos0, float &puckpos1, float &puckvel0, float &puckvel1)
 {
 	for (int i = 0; i < 20; i++) {
@@ -211,7 +280,7 @@ extern void draw_bricks()
 	*/
     glPushMatrix();
     glColor3ub(100, 200, 100);
-
+	// Draws AI paddle
 	glBegin(GL_TRIANGLE_FAN);
 	for (int i = 0; i < 360; i++) {
 		float theta = 3.1415926 * 2 * i / 360.0;
@@ -220,7 +289,7 @@ extern void draw_bricks()
 		glVertex2f(x + ai_paddle.pos[0], y + ai_paddle.pos[1]);
 	}
 	glEnd();
-
+	// Draws the autoplay AI paddle when autoplay is on
 	if (autoplay) {
 		glColor3ub(100, 100, 200);
 		glBegin(GL_TRIANGLE_FAN);
@@ -235,6 +304,7 @@ extern void draw_bricks()
 }
 
 // Updates brick positions
+// Difficulty determines timing interval for bricks to move
 extern void move_bricks(int xres)
 {	
 	srand(time(NULL));
@@ -248,13 +318,17 @@ extern void move_bricks(int xres)
 		case 2:	offset = 1;
 				break;
 	}
+	
+	// Sets time to move brick
 	if (!is_timing) {
 		timer = (unsigned)time(NULL) + offset;
 		is_timing = 1;
 	}
+ 
+	// When current time meets goal time, move bricks at random across screen
 	if ((unsigned)time(NULL) >= timer) {
 		for (int i = 0; i < 20; i++) {
-			int selection = rand() % 19 + 1;
+			int selection = rand() % 19;
 
 			if (i < 10 && i == selection) {
 					bricks[i].pos[0]+=speed;
@@ -262,7 +336,6 @@ extern void move_bricks(int xres)
 			else if (i >= 10 && i == selection) {
 					bricks[i].pos[0]+=-speed;
 			}
-			//bricks[i].pos[0] += change_brick_vel(i, bricks[i].pos[0]);
 			if (bricks[i].pos[0] > (xres + 1  + bricks[i].w) || bricks[i].pos[0] < -bricks[i].w) {
 				if (i < 10)
 					bricks[i].pos[0] = -bricks[i].w;
@@ -299,6 +372,20 @@ extern int check_ai_goal(float puckpos0, float puckpos1, float puckw)
 	}
 	else
 		return 0;
+}
+
+// Toggles autoplay mode, equalizes player and autoplay paddle positions
+extern void set_autoplay(int a, float &paddlepos0, float &paddlepos1)
+{
+	autoplay = a;
+	if (a == 0) {
+		paddlepos0 = autoplay_paddle.pos[0];
+		paddlepos1 = autoplay_paddle.pos[1];
+	}
+	else {
+		autoplay_paddle.pos[0] = paddlepos0;
+		autoplay_paddle.pos[1] = paddlepos1;
+	}
 }
 
 // AI paddle tracks puck location, moves back to center if not coming towards it's side

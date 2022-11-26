@@ -2,7 +2,10 @@
 
 extern void set_difficulty(int a);
 extern int check_autoplay();
-extern void set_autoplay(int a);
+extern void show_autoplay(int a, int xres, int yres);
+extern void show_difficulty(int a, int xres, int yres);
+extern void set_autoplay(int a, float &paddlepos0, float &paddlepos1);
+extern void show_winner(int a, int xres, int yres);
 extern void show_intro_screen(GLuint introTexture, int xres, int yres);
 extern void show_background(GLuint backgroundTexture, int xres, int yres);
 extern void reset_brick_pos(int xres);

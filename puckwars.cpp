@@ -55,7 +55,15 @@ class Global {
 	int pressButton;
 	int del;
 	int enter;
+	int difficulty_mode;
+	int display_difficulty;
+	int difficulty_timer;
+	int autoplay_timer;
+	int display_autoplay;
 	int increaseSZ; //increase size
+	int winner;
+	int game_over;
+	int game_over_timer;
 	Global()
 	{
 		pressButton = 0;
@@ -76,12 +84,20 @@ class Global {
 	    player_score = 0;
 		ai_score = 0;
 	    cheat = 0;
-		circleShape = 0;
+		circleShape = 1;
 		powerUp = 0;
 		pUpSize = 40;
 		speedCap = 19;
 		firstTime = true;
 		increaseSZ = 1;
+		difficulty_mode = 0;
+		display_difficulty = 0;
+		difficulty_timer = 0;
+		autoplay_timer = 0;
+		display_autoplay = 0;
+		winner = 0;
+		game_over = 0;
+		game_over_timer = 0;
 	}
 } gl;
 
@@ -168,7 +184,8 @@ class Box {
 	    w = width;
 	    pos[0] = p0;
 	    pos[1] = p1;
-	    vel[0] = vel[1] = v1;
+	    vel[0] = .5;
+		vel[1] = v1;
 	}
 };
 
@@ -356,6 +373,13 @@ void X11_wrapper::check_mouse(XEvent *e)
 	    gl.mouse_x = savex;
 	    gl.mouse_y = gl.yres - savey;
 	    //Code placed here will execute whenever the mouse moves.
+		if (!gl.intro_screen) {
+			if (check_autoplay()) {
+				set_autoplay(0, paddle.pos[0], paddle.pos[1]);
+				gl.display_autoplay = 1;
+				gl.autoplay_timer = (unsigned)time(NULL) + 2;
+			}
+		}
 	}
     }
 }
@@ -372,10 +396,13 @@ int X11_wrapper::check_keys(XEvent *e)
 		break;
 	    case XK_Escape:
 		//Escape key was pressed
-		return 1;
+			return 1;
 	    case XK_Return:
-		gl.intro_screen = 0;
-		break;
+			gl.intro_screen = 0;
+			set_autoplay(0, paddle.pos[0], paddle.pos[1]);
+			if (gl.pressed == 0)
+				reset();
+			break;
 	    case XK_p:
 		gl.pause = manage_pstate(gl.pause);
 		break;
@@ -412,7 +439,9 @@ int X11_wrapper::check_keys(XEvent *e)
 			gl.pressed = 0;
 		break;
 		case XK_a:
-			set_autoplay(!check_autoplay());
+			set_autoplay(!check_autoplay(), paddle.pos[0], paddle.pos[1]);
+			gl.display_autoplay = 1;
+			gl.autoplay_timer = (unsigned)time(NULL) + 2;
 			break;
 	    case XK_c:
 			gl.credit += 1;
@@ -431,12 +460,21 @@ int X11_wrapper::check_keys(XEvent *e)
 			break;
 		case XK_F9:
 			set_difficulty(0);
+			gl.difficulty_mode = 0;
+			gl.display_difficulty = 1;
+			gl.difficulty_timer = (unsigned)time(NULL) + 2;
 			break;
 		case XK_F10:
 			set_difficulty(1);
+			gl.difficulty_mode = 1;
+			gl.display_difficulty = 1;
+			gl.difficulty_timer = (unsigned)time(NULL) + 2;
 			break;
 		case XK_F11:
 			set_difficulty(2);
+			gl.difficulty_mode = 2;
+			gl.display_difficulty = 1;
+			gl.difficulty_timer = (unsigned)time(NULL) + 2;
 			break;	
 	    case XK_F12:
 			gl.bricks_feature = !gl.bricks_feature;
@@ -572,7 +610,7 @@ void physics()
 	    paddle.pos[1] = 580;
 	paddle.vel[1] = (paddle.pos[1] - old_pos) / 1.5;
 	// Puck begins to move
-	if (gl.pressed) {
+	if (gl.pressed || gl.intro_screen) {
 	    puck.pos[0] += puck.vel[0];
 	    puck.pos[1] += puck.vel[1];
 	    if (gl.firstTime) {
@@ -654,7 +692,6 @@ if (!check_autoplay()) {
 	}
 }
 	
-
 	ai_paddle_physics(puck.pos[0], puck.pos[1], puck.w, puck.vel[1], puck.vel[0], gl.yres);	
 
 	if (gl.pressed) {
@@ -664,13 +701,15 @@ if (!check_autoplay()) {
 	check_brick_hit(puck.w, puck.pos[0], puck.pos[1], puck.vel[0], puck.vel[1]);
 	if (check_player_goal(puck.pos[0], puck.pos[1], puck.w)) {
 	    reset();
-	    gl.player_score++;
+		if (!gl.intro_screen)
+	    	gl.player_score++;
 	    gl.pressed = 0;
 		gl.powerUp = 0;
 	}
 	if (check_ai_goal(puck.pos[0], puck.pos[1], puck.w)) {
 		reset();
-		gl.ai_score++;
+		if (!gl.intro_screen)
+			gl.ai_score++;
 		gl.pressed = 0;
 		gl.powerUp = 0;
 	}
@@ -681,6 +720,16 @@ if (!check_autoplay()) {
 	}
 		if (puck.vel[1] > gl.speedCap){
 		puck.vel[1] = gl.speedCap;
+	}
+
+	// If player or ai gets 7 goals, ends game
+	if (gl.player_score == 7 || gl.ai_score == 7) {
+		gl.game_over = 1;
+		gl.game_over_timer = (unsigned)time(NULL) + 2;
+		if (gl.player_score > gl.ai_score)
+			gl.winner = 1;
+		gl.ai_score = 0;
+		gl.player_score = 0;
 	}
 }
 
@@ -699,20 +748,37 @@ void render()
     // Render background
     show_background(backgroundTexture, gl.xres, gl.yres);
     // Define positions for instruction text
-	r.bot = gl.yres - 45;
-	r.left = 30;
-	r.center = 0;
-	ggprint16(&r, 20, 0x0088aaff, "Your Score: 	%d", gl.player_score);
-	ggprint16(&r, 16, 0x0088aaff, "AI Score:	%d", gl.ai_score);
-    r.bot = gl.yres/1.5;
-    r.left = gl.xres/2;
-    r.center = -5;
-    if (!gl.pressed) {
-	ggprint8b(&r, 16, 0x00ff0000, "PRESS SPACE TO START");
-	ggprint8b(&r, 16, 0x00ff0000, "F12 - START/STOP BRICK FEATURE MODE");
-	ggprint8b(&r, 20, 0x00ff0000, "PRESS X TO SPAWN POWER UP");
-	ggprint8b(&r, 20, 0x00ff0000, "PRESS F1 for detailed instructions");
-    }
+	if (!gl.intro_screen) {
+		if (gl.display_difficulty) {
+			show_difficulty(gl.difficulty_mode, gl.xres, gl.yres);
+			if ((unsigned)time(NULL) >= gl.difficulty_timer)
+				gl.display_difficulty = 0;
+		}
+		if (gl.display_autoplay) {
+			show_autoplay(check_autoplay(), gl.xres, gl.yres);
+			if ((unsigned)time(NULL) >= gl.autoplay_timer)
+				gl.display_autoplay = 0;
+		}
+		if (gl.game_over) {
+			show_winner(gl.winner, gl.xres, gl.yres);
+			if ((unsigned)time(NULL) >= gl.game_over_timer)
+				gl.game_over = 0;
+		}
+	
+		r.bot = gl.yres - 45;
+		r.left = 30;
+		r.center = 0;
+		ggprint16(&r, 20, 0x0088aaff, "Your Score: 	%d", gl.player_score);
+		ggprint16(&r, 16, 0x0088aaff, "AI Score:	%d", gl.ai_score);
+    	r.bot = gl.yres/1.5;
+    	r.left = gl.xres/2;
+    	r.center = -5;
+    	if (!gl.pressed) {
+		ggprint8b(&r, 16, 0x00ff0000, "PRESS SPACE TO START");
+		ggprint8b(&r, 20, 0x00ff0000, "PRESS X TO SPAWN POWER UP");
+		ggprint8b(&r, 20, 0x00ff0000, "PRESS F1 for detailed instructions");
+    	}
+	}
     // Draw paddle
    if (!check_autoplay()) { 
 		static float h_tmp = paddle.h;
@@ -856,4 +922,5 @@ void render()
 		//pass in vector and size of power up
 		drawPowerUps(gl.p1, gl.pUpSize);
 	}
+
 }
