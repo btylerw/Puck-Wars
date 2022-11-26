@@ -695,7 +695,7 @@ if (!check_autoplay()) {
 	ai_paddle_physics(puck.pos[0], puck.pos[1], puck.w, puck.vel[1], puck.vel[0], gl.yres);	
 
 	if (gl.pressed) {
-		move_bricks(gl.xres);
+		move_bricks(gl.xres, gl.bricks_feature);
 	}
 
 	check_brick_hit(puck.w, puck.pos[0], puck.pos[1], puck.vel[0], puck.vel[1]);

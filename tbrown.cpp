@@ -305,7 +305,7 @@ extern void draw_bricks()
 
 // Updates brick positions
 // Difficulty determines timing interval for bricks to move
-extern void move_bricks(int xres)
+extern void move_bricks(int xres, int toggle)
 {	
 	srand(time(NULL));
 	int speed = 20;
@@ -326,7 +326,7 @@ extern void move_bricks(int xres)
 	}
  
 	// When current time meets goal time, move bricks at random across screen
-	if ((unsigned)time(NULL) >= timer) {
+	if ((unsigned)time(NULL) >= timer || toggle) {
 		for (int i = 0; i < 20; i++) {
 			int selection = rand() % 19;
 
