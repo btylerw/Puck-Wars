@@ -510,7 +510,6 @@ void reset()
     puck.vel[0] 	= puck.vel[1] = 0;
     paddle.pos[0] 	= gl.xres /2;
     gl.firstTime = true;
-	reset_brick_pos(gl.xres);
 	gl.bricks_feature = 0;
 	gl.powerUp = 0;
 	gl.increaseSZ = 1;
