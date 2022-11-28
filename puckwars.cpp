@@ -34,6 +34,7 @@ typedef float pUpVec[3]; //power up vector
 class Global {
     public:
 	int xres, yres;
+    int saveTest;
 	int mouse_x, mouse_y;
 	int pressed;
 	int intro_screen;
@@ -67,6 +68,7 @@ class Global {
 	Global()
 	{
 		pressButton = 0;
+        saveTest = 0;
 	    xres = 600;
 	    yres = 1200;
 	    pressed = 0;
@@ -420,6 +422,7 @@ int X11_wrapper::check_keys(XEvent *e)
 		//gl.help_screen = 0;
 		if (gl.enter > 2) {
 			gl.enter = 0;
+            gl.del = 0;
 		}
 		break;
 	    case XK_Control_L:
@@ -857,11 +860,11 @@ void render()
 		gl.del = 0;
 	    }
 	} 
-	int x1, x2, x3;
-	r.bot = gl.yres/2 + 160;    
-    	r.left = gl.xres/2 - 80;
+	int x1 = 0, x2 = 0, x3 = 0;
+	r.bot = gl.yres/2 + 73;    
+    r.left = gl.xres/2 - 81;
    	if (gl.enter == 0) {
-	if (gl.del == 1) {
+	    if (gl.del == 1) {
             ggprint16(&r, 0, 0x0088aaff, "1");
         }
         if (gl.del == 2) {
@@ -870,12 +873,11 @@ void render()
         if (gl.del == 3) {
             ggprint16(&r, 0, 0x0088aaff, "3");
         }
-	}
-	x1 = gl.del;
+    }
 	///
 	if (gl.enter == 1) {
-	r.left = gl.xres/2;
-	if (gl.del == 1) {
+	    r.left = gl.xres/2;
+	    if (gl.del == 1) {
             ggprint16(&r, 0, 0x0088aaff, "1");
         }
         if (gl.del == 2) {
@@ -884,8 +886,8 @@ void render()
         if (gl.del == 3) {
             ggprint16(&r, 0, 0x0088aaff, "3");
         }
-	x2 = gl.del;
-	}
+    }
+
 	if (gl.enter == 2) {
 	r.left = gl.xres/2 + 80;
         if (gl.del == 1) {
@@ -897,23 +899,38 @@ void render()
         if (gl.del == 3) {
             ggprint16(&r, 0, 0x0088aaff, "3");
         }
-	x3 = gl.del;
-        }
-	if (gl.plusP != 0) {
+    }
+	if ((gl.plusP == 1) && (gl.ai_score == 0)) {
 	    gl.ai_score = 1;
 	}
+    if ((gl.enter == 0) && (gl.del == 1)) {
+        gl.saveTest += 1;
+    }
+    else if ((gl.enter == 1) && (gl.del == 2)) {
+        gl.saveTest += 2;
+    }
+    else if ((gl.enter == 2) && (gl.del == 3)) {
+        gl.saveTest += 3;
+    }
 	//some cheat codes
-	//code 1: 123
-	//if ((x1 = 1) && (x2 = 2) && (x3 = 3)) {
-	if (x1 = 2, x2 = 2, x3 = 3)	 
-     		gl.player_score = 1;
-	   //gl.player_score += 1;
+	if ((gl.enter == 0) && (gl.del == 3)) {
+        gl.player_score = 7;
+    }
+    if ((gl.enter == 1) && (gl.del == 2)) {
+        gl.ai_score = 0;
+    }
+    if ((gl.enter == 2) && (gl.del == 1)) {
+        gl.player_score = gl.ai_score + 1;
+    }
+                      
+
 	
 
     }
     if (gl.credit != 0) {
-	showCredit(creditTexture, gl.xres, gl.yres);
-	r.bot = gl.yres-50;
+	//showCredit(creditTexture, gl.xres, gl.yres);
+	showCredit(gl.xres, gl.yres);
+    r.bot = gl.yres-50;
 	ggprint16(&r, 0, 0x0088aaff, "Credit Screen");
 	r.bot = gl.yres-100;
 	ggprint16(&r, 0, 0x0088aaff, "Tyler, Andres, Aldair, Anh, Abisai");

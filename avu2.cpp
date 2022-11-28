@@ -9,24 +9,21 @@
 #include <iostream>
 #include <cstdlib>
 #include <GL/glut.h>
+#include "fonts.h"
 
 //std::string credit_html =
 //#include "credit.html";
 
 
-int del = 0;
-
-extern int showCredit(GLuint creditTexture, int xres, int yres) 
+extern int showCredit(int xres, int yres) 
 {	  
-    glBindTexture(GL_TEXTURE_2D, creditTexture);
-    glColor3f(1.0, 1.0, 0.0);
+    glColor3f(0.1, 0.1, 0.1);
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f);   glVertex2i(0,    0);
-    glTexCoord2f(0.0f, 0.25f);  glVertex2i(0,    yres);
-    glTexCoord2f(1.0f, 0.25f);  glVertex2i(xres, yres);
-    glTexCoord2f(1.0f, 1.0f);   glVertex2i(xres, 0);
+    glVertex2i(0,    0);
+    glVertex2i(0,    yres);
+    glVertex2i(xres, yres);
+    glVertex2i(xres, 0);
     glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
     return 0;
 }
 
@@ -80,43 +77,34 @@ void drawCircle(int x, int y, GLfloat xcenter, GLfloat ycenter) {
     int triangleAmount = 20; //# of triangles used to draw circle
     GLfloat twicePi = 2.0f * 3.14;
 	
-    if (del != 1) {
-    	glBegin(GL_TRIANGLE_FAN);
-   	glVertex2f(x, y); // center of circle
-    	for (i = 0; i <= triangleAmount; i++) {
-		glVertex2f(
-			x + ((xcenter+1)* cos(i * twicePi / triangleAmount)),
-			y + ((ycenter-1)* sin(i * twicePi / triangleAmount)));
-    	}
-    glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(x, y); // center of circle
+    for (i = 0; i <= triangleAmount; i++) {
+        glVertex2f(
+                x + ((xcenter+1)* cos(i * twicePi / triangleAmount)),
+                y + ((ycenter-1)* sin(i * twicePi / triangleAmount)));
     }
+    glEnd();
 }
 
-//Initial circles
+//Circles
 void greenCircle(int xres, int yres) {
+    Rect r;
+    r.bot = xres/2;
+    r.left = yres/2;
+    r.center = 0;
     //green
     glColor3f(0.0f, 1.0f, 0.0f);
-    drawCircle(xres/2 - 80, yres/2 + 160, 30, 30);
-    drawCircle(xres/2 + 80, yres/2 + 160, 30, 30);
-    drawCircle(xres/2, yres/2 + 160, 30, 30);
+    drawCircle(xres/2 - 80, yres/2 + 80, 30, 30);
+    drawCircle(xres/2 + 80, yres/2 + 80, 30, 30);
+    drawCircle(xres/2     , yres/2 + 80, 30, 30);
+    //cyan
+    glColor3f(0.5f, 1.0f, 1.0f);
+    drawCircle(xres/2     , yres/2 - 20, 30, 30);
 }
-/*
-void cheatMotion(int xres, int yres, int x, int y) {
-        //green
-    if (y = yres/2 + 160)
-        glColor3f(0.0f, 1.0f, 0.0f);
-        if (x = xres/2) {
-            drawCircle(xres/2, yres/2 + 160, 30, 30);
-        }
-        if (x = xres/2 - 80) {
-            drawCircle(xres/2 - 80, yres/2 + 160, 30,30);
-        }
-        if (x = xres/2 + 80) {
-            drawCircle(xres/2 + 80, yres/2 + 160, 30, 30);
-        }
-}
-*/
+//
 
+//
 //function call
 void showCheat(int xres, int yres) {
     float r = 4;
@@ -131,5 +119,4 @@ void showCheat(int xres, int yres) {
       drawCircle(xres/2, yres/2 + 5*b*i, 30, 30);
       }*/
 }
-
 
