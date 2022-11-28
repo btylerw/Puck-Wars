@@ -6,25 +6,69 @@
 #include <GL/glx.h>
 #include "avu2.h"
 #include <math.h>
-#include <iostream>
 #include <cstdlib>
 #include <GL/glut.h>
 #include "fonts.h"
 
-//std::string credit_html =
-//#include "credit.html";
-
-
+//Interact with mouse check function on main
+extern void print(int xres, int yres, int num, int enter) {
+    Rect r;
+    r.bot = yres/2 + 73;
+    if (enter == 0) {
+        r.left = xres/2 - 81;
+        if (num == 1) {
+            ggprint16(&r, 0, 0x0088aaff, "1");
+        }
+        if (num == 2) {
+            ggprint16(&r, 0, 0x0088aaff, "2");
+        }
+        if (num == 3) {
+            ggprint16(&r, 0, 0x0088aaff, "3");
+        }
+    }
+    else if (enter == 1) {
+        r.left = xres/2;
+        if (num == 1) {
+            ggprint16(&r, 0, 0x0088aaff, "1");
+        }
+        if (num == 2) {
+            ggprint16(&r, 0, 0x0088aaff, "2");
+        }
+        if (num == 3) {
+            ggprint16(&r, 0, 0x0088aaff, "3");
+        }
+    }
+    else if (enter == 2) {
+        r.left = xres/2 + 80;
+        if (num == 1) {
+            ggprint16(&r, 0, 0x0088aaff, "1");
+        }
+        if (num == 2) {
+            ggprint16(&r, 0, 0x0088aaff, "2");
+        }
+        if (num == 3) {
+            ggprint16(&r, 0, 0x0088aaff, "3");
+        }
+    }
+}
+//Credit screen
 extern int showCredit(int xres, int yres) 
-{	  
-    glColor3f(0.1, 0.1, 0.1);
+{	
+    Rect r;  
+    glColor3f(0.2, 0.2, 0.2);
     glBegin(GL_QUADS);
     glVertex2i(0,    0);
     glVertex2i(0,    yres);
     glVertex2i(xres, yres);
     glVertex2i(xres, 0);
     glEnd();
+    r.left = xres/2;
+    r.bot = yres - 150;
+    ggprint16(&r, 0, 0x0000CCCC, "Credit");
+    r.bot = yres - 200;
+    ggprint16(&r, 0, 0x00006600, "Tyler, Andres, Aldair, Anh, Abisai");
     return 0;
+
 }
 
 extern void showFeature(int xres, int yres) {
@@ -45,13 +89,11 @@ extern void showFeature(int xres, int yres) {
     glVertex2i(xres-w, yres-w);
     glVertex2i(xres,   0);
     glVertex2i(xres-w, w);
-    /*glVertex2i(0,   0);
-      glVertex2i(0+w, w);*/
     glEnd();
     glDisable(GL_BLEND);
 }
 
-//cheat code box will be displayed here
+//Place for cheat code
 extern void drawCheatCode(int xres, int yres) {
     //Draw a border using a triangle strip
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -76,7 +118,7 @@ void drawCircle(int x, int y, GLfloat xcenter, GLfloat ycenter) {
     int i;
     int triangleAmount = 20; //# of triangles used to draw circle
     GLfloat twicePi = 2.0f * 3.14;
-	
+
     glBegin(GL_TRIANGLE_FAN);
     glVertex2f(x, y); // center of circle
     for (i = 0; i <= triangleAmount; i++) {
@@ -103,20 +145,10 @@ void greenCircle(int xres, int yres) {
     drawCircle(xres/2     , yres/2 - 20, 30, 30);
 }
 //
-
-//
-//function call
+//function used to call features
 void showCheat(int xres, int yres) {
-    float r = 4;
-    int b ;
-    int c = 0;
-    srand((unsigned)time(NULL));
-    b = rand() % 10;
     showFeature(xres, yres);
     drawCheatCode(xres, yres);
     greenCircle(xres, yres);
-    /*for (int i = 0; i < 10; i++) {
-      drawCircle(xres/2, yres/2 + 5*b*i, 30, 30);
-      }*/
 }
 

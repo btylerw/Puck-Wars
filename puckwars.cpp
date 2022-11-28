@@ -510,7 +510,6 @@ void reset()
     puck.vel[0] 	= puck.vel[1] = 0;
     paddle.pos[0] 	= gl.xres /2;
     gl.firstTime = true;
-	reset_brick_pos(gl.xres);
 	gl.bricks_feature = 0;
 	gl.powerUp = 0;
 	gl.increaseSZ = 1;
@@ -845,95 +844,34 @@ void render()
 	*/
 	}
     if (gl.feature != 0) {
-	showCheat(gl.xres, gl.yres);
-	gl.pause;
-	gl.help_screen;
-	r.bot = gl.yres - 380;
-	ggprint16(&r, 0, 0x00ff3333, "Cheat Time");
-	r.bot = gl.yres - 700;
-	ggprint16(&r, 0, 0x00ff3333, "Try 123");
-	r.bot = gl.yres - 620;
-	ggprint16(&r, 0, 0x00ff3333, "Left Ctrl to test");
-	if (gl.pressButton == 1) {
-	    gl.del += 1;
-	    if (gl.del > 4) {
-		gl.del = 0;
-	    }
-	} 
-	int x1 = 0, x2 = 0, x3 = 0;
-	r.bot = gl.yres/2 + 73;    
-    r.left = gl.xres/2 - 81;
-   	if (gl.enter == 0) {
-	    if (gl.del == 1) {
-            ggprint16(&r, 0, 0x0088aaff, "1");
+	    showCheat(gl.xres, gl.yres);
+        r.bot = gl.yres - 380;
+	    ggprint16(&r, 0, 0x00ff3333, "Win the game without playing ?");
+	    r.bot = gl.yres - 620;
+	    ggprint16(&r, 0, 0x00ff3333, "Left Ctrl to test");
+	    if (gl.pressButton == 1) {
+	        gl.del += 1;
+	        if (gl.del > 4) {
+		        gl.del = 0;
+	        }
         }
-        if (gl.del == 2) {
-            ggprint16(&r, 0, 0x0088aaff, "2");
-        }
-        if (gl.del == 3) {
-            ggprint16(&r, 0, 0x0088aaff, "3");
-        }
-    }
-	///
-	if (gl.enter == 1) {
-	    r.left = gl.xres/2;
-	    if (gl.del == 1) {
-            ggprint16(&r, 0, 0x0088aaff, "1");
-        }
-        if (gl.del == 2) {
-            ggprint16(&r, 0, 0x0088aaff, "2");
-        }
-        if (gl.del == 3) {
-            ggprint16(&r, 0, 0x0088aaff, "3");
-        }
-    }
-
-	if (gl.enter == 2) {
-	r.left = gl.xres/2 + 80;
-        if (gl.del == 1) {
-            ggprint16(&r, 0, 0x0088aaff, "1");
-        }
-        if (gl.del == 2) {
-            ggprint16(&r, 0, 0x0088aaff, "2");
-        }
-        if (gl.del == 3) {
-            ggprint16(&r, 0, 0x0088aaff, "3");
-        }
-    }
-	if ((gl.plusP == 1) && (gl.ai_score == 0)) {
-	    gl.ai_score = 1;
-	}
-    if ((gl.enter == 0) && (gl.del == 1)) {
-        gl.saveTest += 1;
-    }
-    else if ((gl.enter == 1) && (gl.del == 2)) {
-        gl.saveTest += 2;
-    }
-    else if ((gl.enter == 2) && (gl.del == 3)) {
-        gl.saveTest += 3;
-    }
-	//some cheat codes
-	if ((gl.enter == 0) && (gl.del == 3)) {
-        gl.player_score = 7;
-    }
-    if ((gl.enter == 1) && (gl.del == 2)) {
-        gl.ai_score = 0;
-    }
-    if ((gl.enter == 2) && (gl.del == 1)) {
-        gl.player_score = gl.ai_score + 1;
-    }
-                      
-
-	
-
+        print(gl.xres, gl.yres, gl.del, gl.enter);
+	    //some cheat codes
+	        if ((gl.enter == 0) && (gl.del == 3)) {
+                gl.player_score = 7;
+            }
+            if ((gl.enter == 1) && (gl.del == 2)) {
+                gl.ai_score = gl.player_score - 2;
+            }
+            if ((gl.enter == 2) && (gl.del == 1)) {
+                gl.player_score = gl.ai_score + 1;
+            }                   
+            if (gl.plusP == 1) {
+                gl.ai_score = 1;
+            }
     }
     if (gl.credit != 0) {
-	//showCredit(creditTexture, gl.xres, gl.yres);
-	showCredit(gl.xres, gl.yres);
-    r.bot = gl.yres-50;
-	ggprint16(&r, 0, 0x0088aaff, "Credit Screen");
-	r.bot = gl.yres-100;
-	ggprint16(&r, 0, 0x0088aaff, "Tyler, Andres, Aldair, Anh, Abisai");
+	    showCredit(gl.xres, gl.yres);
     }
 	if(gl.powerUp) {
 		//pass in vector and size of power up
