@@ -8,6 +8,7 @@
 
 using namespace std;
 
+extern void reset_brick_pos(int xres);
 
 
 void show_name() {
@@ -81,8 +82,35 @@ extern void drawPowerUps(float* p1, int sz)
 
 extern float speedUp(float* vel)
 {
-	vel[0] *= 1.8;
-	vel[1] *= 1.7;
+	vel[0] *= 1.5;
+	vel[1] *= 1.5;
 	return *vel;
 
+}
+
+extern void reset(float* puckPos, int xres, int yres, 
+float* velocity, bool firstTime, int brick_feature, 
+int powerUp, int increaseSZ)
+{
+	puckPos[0] 		= xres / 2;
+    puckPos[1] 		= yres / 2;
+    velocity[0] 	= velocity[1] = 0;
+    //paddle.pos[0] 	= xres /2;
+    firstTime = true;
+	reset_brick_pos(xres);
+	brick_feature = 0;
+	powerUp = 0;
+	increaseSZ = 1;
+	reset_brick_pos(xres);	
+
+}
+
+extern void limit_speed(float* vel, int speedCap)
+{
+	if (vel[0] > speedCap){
+		vel[0] = speedCap;
+	}
+	if (vel[1] > speedCap){
+		vel[1] = speedCap;
+	}
 }

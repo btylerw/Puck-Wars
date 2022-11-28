@@ -89,7 +89,7 @@ class Global {
 		circleShape = 1;
 		powerUp = 0;
 		pUpSize = 40;
-		speedCap = 19;
+		speedCap = 15;
 		firstTime = true;
 		increaseSZ = 1;
 		difficulty_mode = 0;
@@ -217,7 +217,7 @@ class X11_wrapper {
 void init_opengl(void);
 void physics(void);
 void render(void);
-void reset();
+//void reset();
 //void draw_circle(float cx, float cy, float radius, int segs);
 
 
@@ -403,7 +403,12 @@ int X11_wrapper::check_keys(XEvent *e)
 			gl.intro_screen = 0;
 			set_autoplay(0, paddle.pos[0], paddle.pos[1]);
 			if (gl.pressed == 0)
-				reset();
+				reset(puck.pos, gl.xres, gl.yres, 
+				puck.vel, gl.firstTime, gl.bricks_feature, 
+				gl.powerUp, gl.increaseSZ);
+				gl.firstTime = true;
+				gl.increaseSZ = 1;
+				gl.powerUp = 0;
 			break;
 	    case XK_p:
 		gl.pause = manage_pstate(gl.pause);
@@ -438,7 +443,13 @@ int X11_wrapper::check_keys(XEvent *e)
 		    gl.help_screen = 1;
 		break;
 		case XK_r:
-			reset();
+			reset(puck.pos, gl.xres, gl.yres, 
+			puck.vel, gl.firstTime, gl.bricks_feature, 
+			gl.powerUp, gl.increaseSZ);
+			gl.increaseSZ = 1;
+			gl.powerUp = 0;
+			gl.pressed = 0;
+			gl.firstTime = true;
 			gl.pressed = 0;
 		break;
 		case XK_a:
@@ -503,6 +514,7 @@ int X11_wrapper::check_keys(XEvent *e)
 }
 
 // Resets everything to starting positions
+/*
 void reset()
 {
     puck.pos[0] 	= gl.xres / 2;
@@ -515,7 +527,7 @@ void reset()
 	gl.increaseSZ = 1;
 	reset_brick_pos(gl.xres);
 }
-
+*/
 void init_opengl(void)
 {
     int h, w; 
@@ -616,7 +628,7 @@ void physics()
 	    puck.pos[0] += puck.vel[0];
 	    puck.pos[1] += puck.vel[1];
 	    if (gl.firstTime) {
-	    puck.vel[1] -= 0.07;
+	    	puck.vel[1] -= 0.07;
 	    }
 	}
 
@@ -702,27 +714,36 @@ if (!check_autoplay()) {
 
 	check_brick_hit(puck.w, puck.pos[0], puck.pos[1], puck.vel[0], puck.vel[1]);
 	if (check_player_goal(puck.pos[0], puck.pos[1], puck.w)) {
-	    reset();
+		reset(puck.pos, gl.xres, gl.yres, 
+		puck.vel, gl.firstTime, gl.bricks_feature, 
+		gl.powerUp, gl.increaseSZ);
+		gl.increaseSZ = 1;
+			//gl.powerUp = 0;
+			//gl.pressed = 0;
+		gl.firstTime = true;
+
 		if (!gl.intro_screen)
 	    	gl.player_score++;
 	    gl.pressed = 0;
 		gl.powerUp = 0;
 	}
 	if (check_ai_goal(puck.pos[0], puck.pos[1], puck.w)) {
-		reset();
+		reset(puck.pos, gl.xres, gl.yres, 
+		puck.vel, gl.firstTime, gl.bricks_feature, 
+		gl.powerUp, gl.increaseSZ);			
+		gl.increaseSZ = 1;
+		gl.pressed = 0;
+		gl.firstTime = true;
+
 		if (!gl.intro_screen)
 			gl.ai_score++;
 		gl.pressed = 0;
 		gl.powerUp = 0;
 	}
     }
-		//set puck speed limit
-		if (puck.vel[0] > gl.speedCap){
-		puck.vel[0] = gl.speedCap;
-	}
-		if (puck.vel[1] > gl.speedCap){
-		puck.vel[1] = gl.speedCap;
-	}
+	//set puck speed limit
+	limit_speed(puck.vel, gl.speedCap);
+
 
 	// If player or ai gets 7 goals, ends game
 	if (gl.player_score == 7 || gl.ai_score == 7) {
