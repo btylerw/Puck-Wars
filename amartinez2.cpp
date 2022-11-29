@@ -44,9 +44,10 @@ extern void help_screen(GLuint help_screen_img, int xres, int yres)
 	*/
 }
 
-//pressing Q changes paddle shape
+//pressing Q key changes paddle shape
 extern void draw_circle(float cx, float cy, float radius, int segs)
 {
+// retrieved from https://stackoverflow.com/questions/22444450/drawing-circle-with-opengl
     glBegin(GL_TRIANGLE_FAN);
     for(int i=0; i<segs; i++) {
 	float theta = 3.1415926 * 2 * i / float(segs);
