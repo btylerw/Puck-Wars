@@ -25,7 +25,7 @@ using namespace std;
 #include "abotello.h"
 #include "avu2.h"
 #include "amartinez2.h"
-#include "adiazperez.h"
+
 
 typedef float pUpVec[3]; //power up vector
 //some structures
@@ -65,9 +65,9 @@ class Global {
 	int winner;
 	int game_over;
 	int game_over_timer;
-    int feat;
-    bool choice;
-    Global()
+	int ball_move;
+    bool cheatPaddle;
+	Global()
 	{
 		pressButton = 0;
         saveTest = 0;
@@ -102,8 +102,8 @@ class Global {
 		winner = 0;
 		game_over = 0;
 		game_over_timer = 0;
-        feat = 0;
-        choice = 0;
+		ball_move = 0;
+        cheatPaddle = false;
 	}
 } gl;
 
@@ -410,9 +410,6 @@ int X11_wrapper::check_keys(XEvent *e)
 				reset(puck.pos, gl.xres, gl.yres, 
 				puck.vel, gl.firstTime, gl.bricks_feature, 
 				gl.powerUp, gl.increaseSZ);
-				gl.firstTime = true;
-				gl.increaseSZ = 1;
-				gl.powerUp = 0;
 			break;
 	    case XK_p:
 		gl.pause = manage_pstate(gl.pause);
@@ -450,10 +447,6 @@ int X11_wrapper::check_keys(XEvent *e)
 			reset(puck.pos, gl.xres, gl.yres, 
 			puck.vel, gl.firstTime, gl.bricks_feature, 
 			gl.powerUp, gl.increaseSZ);
-			gl.increaseSZ = 1;
-			gl.powerUp = 0;
-			gl.pressed = 0;
-			gl.firstTime = true;
 			gl.pressed = 0;
 		break;
 		case XK_a:
@@ -500,6 +493,9 @@ int X11_wrapper::check_keys(XEvent *e)
 		case XK_q:
 			gl.circleShape ^= 1;
 			break;
+		case XK_F7:
+			gl.ball_move = !gl.ball_move;
+			break;
 		case XK_x:
 			gl.powerUp ^= 1;
 			if(gl.powerUp == 1)
@@ -509,20 +505,13 @@ int X11_wrapper::check_keys(XEvent *e)
 				//gl.powerUp = 0;
 
 			break;
-        case XK_t:
-            gl.feat ^= 1;
-            break;
-        case XK_n:
-            if(gl.feat)
-                gl.choice ^= 1;
-            break;
-    }
+	}
     }
     return 0;
 }
 
 // Resets everything to starting positions
-/*
+/*  			Refactored into amartinez.cpp
 void reset()
 {
     puck.pos[0] 	= gl.xres / 2;
@@ -626,8 +615,15 @@ void physics()
 	// Saving previous paddle pos for velocity calculation
 	int old_pos = paddle.pos[1];
 	// Updates paddle position with new mouse coordinates
-	paddle.pos[0] = gl.mouse_x;
-	paddle.pos[1] = gl.mouse_y;
+	if (!gl.ball_move) {
+		paddle.pos[0] = gl.mouse_x;
+		paddle.pos[1] = gl.mouse_y;
+	}
+	else {
+		puck.vel[0] = puck.vel[1] = 1;
+		puck.pos[0] = gl.mouse_x;
+		puck.pos[1] = gl.mouse_y;
+	}
 	if (paddle.pos[1] > 580)
 	    paddle.pos[1] = 580;
 	paddle.vel[1] = (paddle.pos[1] - old_pos) / 1.5;
@@ -718,10 +714,6 @@ if (!check_autoplay()) {
 		reset(puck.pos, gl.xres, gl.yres, 
 		puck.vel, gl.firstTime, gl.bricks_feature, 
 		gl.powerUp, gl.increaseSZ);
-		gl.increaseSZ = 1;
-			//gl.powerUp = 0;
-			//gl.pressed = 0;
-		gl.firstTime = true;
 
 		if (!gl.intro_screen)
 	    	gl.player_score++;
@@ -732,9 +724,6 @@ if (!check_autoplay()) {
 		reset(puck.pos, gl.xres, gl.yres, 
 		puck.vel, gl.firstTime, gl.bricks_feature, 
 		gl.powerUp, gl.increaseSZ);			
-		gl.increaseSZ = 1;
-		gl.pressed = 0;
-		gl.firstTime = true;
 
 		if (!gl.intro_screen)
 			gl.ai_score++;
@@ -865,39 +854,48 @@ void render()
 	    ggprint16(&r, 0, 0x00ff3333, "Win the game without playing ?");
 	    r.bot = gl.yres - 620;
 	    ggprint16(&r, 0, 0x00ff3333, "Left Ctrl to test");
+        showSuggestion(gl.xres, gl.yres);
 	    if (gl.pressButton == 1) {
 	        gl.del += 1;
 	        if (gl.del > 4) {
 		        gl.del = 0;
 	        }
+            blinkCircle(gl.xres, gl.yres); 
         }
-        print(gl.xres, gl.yres, gl.del, gl.enter);
+        printNumber(gl.xres, gl.yres, gl.del, gl.enter);
 	    //some cheat codes
 	        if ((gl.enter == 0) && (gl.del == 3)) {
                 gl.player_score = 7;
             }
             if ((gl.enter == 1) && (gl.del == 2)) {
-                gl.ai_score = gl.player_score - 2;
+                gl.ai_score = gl.player_score - 1;
+                if (gl.ai_score < 0) {
+                    gl.ai_score = 0;
+                }
+            }
+            if ((gl.enter == 1) && (gl.del == 1)){
+                gl.player_score = gl.ai_score + 1;
             }
             if ((gl.enter == 2) && (gl.del == 1)) {
-                gl.player_score = gl.ai_score + 1;
-            }                   
-            if (gl.plusP == 1) {
+			    gl.cheatPaddle = true;
+            }
+            else if ((gl.enter == 2) && (gl.del == 2)) {
+                gl.cheatPaddle = false;
+            }
+            if (gl.plusP != 0) {
                 gl.ai_score = 1;
             }
     }
+    if (gl.cheatPaddle) {
+        draw_circle(paddle.pos[0], paddle.pos[1], 100.0 * gl.increaseSZ, 360);
+    }
     if (gl.credit != 0) {
-	    showCredit(gl.xres, gl.yres);
+	    //showCredit(gl.xres, gl.yres);
+		showCredit(creditTexture, gl.xres, gl.yres);
     }
 	if(gl.powerUp) {
 		//pass in vector and size of power up
 		drawPowerUps(gl.p1, gl.pUpSize);
 	}
-    if(gl.feat) {
-        trail(puck.pos[0], puck.pos[1], puck.vel, gl.choice);
-        r.left = 497;
-        r.bot = 50;
-        r.center = -5;
-        ggprint16(&r, 10, 0x11ff0044, "n to change pattern");
-    }
+
 }
