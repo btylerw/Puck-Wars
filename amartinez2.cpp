@@ -15,20 +15,7 @@ void show_name() {
 	printf("aldair\n");
 	//return 0;
 }
-//global
-//create unsigned var
-//put var in case statements credits
-//credits =^ 1			(replace with manage state)
-//credits = manage_state(credits)
-//void function show credits
-//show credits function is called in render
-//	if credits 
-//		show_credits()
-//create header file
-//		amartinez2.h
-//int main.cpp file, add: 
-//		#include "amartinez2.h"
-//	add amartinez2.h in Make file
+
 
 unsigned int manage_state(unsigned int s)
 {
@@ -56,6 +43,8 @@ extern void help_screen(GLuint help_screen_img, int xres, int yres)
 	cout << "F1 key: close help screen\n";	
 	*/
 }
+
+//pressing Q changes paddle shape
 extern void draw_circle(float cx, float cy, float radius, int segs)
 {
     glBegin(GL_TRIANGLE_FAN);
@@ -68,6 +57,7 @@ extern void draw_circle(float cx, float cy, float radius, int segs)
     glEnd();
 
 }
+
 // p1 is vector, sz is size in pixels
 extern void drawPowerUps(float* p1, int sz)
 {
@@ -80,12 +70,12 @@ extern void drawPowerUps(float* p1, int sz)
 	glEnd();
 }
 
+//power up
 extern float speedUp(float* vel)
 {
 	vel[0] *= 1.5;
 	vel[1] *= 1.5;
 	return *vel;
-
 }
 
 extern void reset(float* puckPos, int xres, int yres, 
@@ -105,6 +95,7 @@ int powerUp, int increaseSZ)
 
 }
 
+//limit speed of puck
 extern void limit_speed(float* vel, int speedCap)
 {
 	if (vel[0] > speedCap){
@@ -112,5 +103,34 @@ extern void limit_speed(float* vel, int speedCap)
 	}
 	if (vel[1] > speedCap){
 		vel[1] = speedCap;
+	}
+}
+
+extern void set_rand_points(float* p1, int xres, int yres)
+{
+		//x axis
+	p1[0] = ((rand() % xres) * 0.75) + (xres * 0.17);
+	//y axis
+	p1[1] = ((rand() % yres) * 0.7) + (yres * 0.2);
+}
+
+//checks distance between puck and power up
+extern void check_distance(float* puckPos, float* p1, 
+int pUpSize, int& increaseSZ, int& powerUp, float* vel) 
+{
+	if (abs(puckPos[1] - p1[1]) < pUpSize && 
+   	(abs(puckPos[0] - p1[0]) < pUpSize))
+	{
+		if ((rand() % 2) == 0 && increaseSZ == 1)
+		{
+			//make paddle bigger
+			increaseSZ = 2;	
+		}
+		else
+		{
+			//speed up puck
+			*vel = speedUp(vel);
+		}
+		powerUp = 0;  //power up goes away
 	}
 }

@@ -43,7 +43,7 @@ class Global {
 	unsigned int pause;
 	unsigned int cheat;
 	unsigned int circleShape;
-	unsigned int powerUp;
+	int powerUp;
 	int help_screen;
 	int bricks_feature;
 	int player_score;
@@ -499,12 +499,9 @@ int X11_wrapper::check_keys(XEvent *e)
 		case XK_x:
 			gl.powerUp ^= 1;
 			if(gl.powerUp == 1)
-				//random points on screen
-				//x axis
-				gl.p1[0] = ((rand() % gl.xres) * 0.75) + (gl.xres * 0.17);
-				//y axis
-				gl.p1[1] = ((rand() % gl.yres) * 0.7) + (gl.yres * 0.2);
+				set_rand_points(gl.p1, gl.xres, gl.yres);
 
+				//random points on screen
 				//gl.powerUp = 0;
 
 			break;
@@ -649,23 +646,14 @@ void physics()
 	    //reset();
 	}
 
-if (gl.powerUp && gl.pressed){
+if (gl.powerUp && gl.pressed)
+{
 //if power up (p1) makes contact with puck
-//(if distance between them is less that n pixels)
-	if (abs(puck.pos[1] - gl.p1[1]) < gl.pUpSize && 
-   	(abs(puck.pos[0] - gl.p1[0]) < gl.pUpSize))
-	{
-		if ((rand() % 2) == 0 && gl.increaseSZ == 1)
-		{
-			gl.increaseSZ = 2;
-		}
-		else
-		{
-			*puck.vel = speedUp(puck.vel);
-		}
-			//cout << gl.p1[0] << " " << gl.p1[1];
-		gl.powerUp = 0;
-	}
+//(if distance between them is less that n pixels) 
+	check_distance(puck.pos, gl.p1, gl.pUpSize, 
+	gl.increaseSZ, gl.powerUp, puck.vel);
+	//gl.powerUp = 0;
+
 }
 	// Check for puck/paddle collision
 	// Adds paddle velocity to puck velocity
@@ -675,11 +663,13 @@ if (!check_autoplay()) {
 		puck.pos[0] > (paddle.pos[0] - paddle.w * gl.increaseSZ) &&
 		puck.pos[0] < (paddle.pos[0] + paddle.w * gl.increaseSZ)) {
 	    	gl.firstTime = false;
-	    if (puck.pos[0] > paddle.pos[0]) {
-		puck.vel[1] = 0;
-		puck.pos[1] = paddle.pos[1] + paddle.h * gl.increaseSZ;
-		puck.vel[1] += paddle.vel[1];
-		puck.vel[0] = 2;
+	    
+		if (puck.pos[0] > paddle.pos[0]) {
+			puck.vel[1] = 0;
+			puck.pos[1] = paddle.pos[1] + paddle.h * gl.increaseSZ;
+			puck.vel[1] += paddle.vel[1];
+			puck.vel[0] = 2;
+		
 		if (paddle.vel[1] <= 0)
 		    puck.vel[1] = 0;
 	    }
@@ -855,14 +845,8 @@ void render()
     }
 
     if (gl.help_screen) {
-	help_screen(helpTexture, gl.xres, gl.yres);
-	r.bot = gl.yres/2;
-	/*
-	ggprint16(&r, 20, 0x0088aaff, "To activate your cheat code: ");
-	ggprint16(&r, 20, 0x0088aaff, "Pressing f");
-	ggprint16(&r, 20, 0x0088aaff, "F9-F11: Change AI Speed");
-	ggprint16(&r, 0, 0x0088aaff, "A: Activate Autoplay");
-	*/
+		help_screen(helpTexture, gl.xres, gl.yres);
+		r.bot = gl.yres/2;
 	}
     if (gl.feature != 0) {
 	    showCheat(gl.xres, gl.yres);
