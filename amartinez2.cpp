@@ -88,7 +88,6 @@ int& powerUp, int& increaseSZ)
     velocity[0] 	= velocity[1] = 0;
     //paddle.pos[0] 	= xres /2;
     firstTime = true;
-	reset_brick_pos(xres);
 	brick_feature = 0;
 	powerUp = 0;
 	increaseSZ = 1;
