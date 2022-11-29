@@ -469,3 +469,17 @@ extern void ai_paddle_physics(float puckpos0, float puckpos1, float puckw, float
 		}
 	}
 }
+
+extern void check_score(int &player_score, int &ai_score, int &game_over, int &game_over_timer, int &winner)
+{
+    if (player_score == 7 || ai_score == 7) {
+	game_over = 1;
+	game_over_timer = (unsigned)time(NULL) + 2;
+	if (player_score > ai_score)
+	    winner = 1;
+	else
+	    winner = 0;
+	ai_score = 0;
+	player_score = 0;
+    }
+}

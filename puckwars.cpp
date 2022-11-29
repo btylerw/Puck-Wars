@@ -747,14 +747,7 @@ if (!check_autoplay()) {
 
 
 	// If player or ai gets 7 goals, ends game
-	if (gl.player_score == 7 || gl.ai_score == 7) {
-		gl.game_over = 1;
-		gl.game_over_timer = (unsigned)time(NULL) + 2;
-		if (gl.player_score > gl.ai_score)
-			gl.winner = 1;
-		gl.ai_score = 0;
-		gl.player_score = 0;
-	}
+	check_score(gl.player_score, gl.ai_score, gl.game_over, gl.game_over_timer, gl.winner);
 }
 
 void render()
