@@ -86,7 +86,6 @@ int& powerUp, int& increaseSZ)
 	puckPos[0] 		= xres / 2;
     puckPos[1] 		= yres / 2;
     velocity[0] 	= velocity[1] = 0;
-    //paddle.pos[0] 	= xres /2;
     firstTime = true;
 	brick_feature = 0;
 	powerUp = 0;
