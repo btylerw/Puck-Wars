@@ -105,6 +105,7 @@ extern void limit_speed(float* vel, int speedCap)
 	}
 }
 
+//places power in random position (within a range)
 extern void set_rand_points(float* p1, int xres, int yres)
 {
 		//x axis
