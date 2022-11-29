@@ -66,6 +66,7 @@ class Global {
 	int game_over;
 	int game_over_timer;
 	int ball_move;
+    bool cheatPaddle;
 	Global()
 	{
 		pressButton = 0;
@@ -102,6 +103,7 @@ class Global {
 		game_over = 0;
 		game_over_timer = 0;
 		ball_move = 0;
+        cheatPaddle = false;
 	}
 } gl;
 
@@ -852,11 +854,13 @@ void render()
 	    ggprint16(&r, 0, 0x00ff3333, "Win the game without playing ?");
 	    r.bot = gl.yres - 620;
 	    ggprint16(&r, 0, 0x00ff3333, "Left Ctrl to test");
+        showSuggestion(gl.xres, gl.yres);
 	    if (gl.pressButton == 1) {
 	        gl.del += 1;
 	        if (gl.del > 4) {
 		        gl.del = 0;
 	        }
+            blinkCircle(gl.xres, gl.yres); 
         }
         printNumber(gl.xres, gl.yres, gl.del, gl.enter);
 	    //some cheat codes
@@ -864,14 +868,26 @@ void render()
                 gl.player_score = 7;
             }
             if ((gl.enter == 1) && (gl.del == 2)) {
-                gl.ai_score = gl.player_score - 2;
+                gl.ai_score = gl.player_score - 1;
+                if (gl.ai_score < 0) {
+                    gl.ai_score = 0;
+                }
+            }
+            if ((gl.enter == 1) && (gl.del == 1)){
+                gl.player_score = gl.ai_score + 1;
             }
             if ((gl.enter == 2) && (gl.del == 1)) {
-                gl.player_score = gl.ai_score + 1;
-            }                   
-            if (gl.plusP == 1) {
+			    gl.cheatPaddle = true;
+            }
+            else if ((gl.enter == 2) && (gl.del == 2)) {
+                gl.cheatPaddle = false;
+            }
+            if (gl.plusP != 0) {
                 gl.ai_score = 1;
             }
+    }
+    if (gl.cheatPaddle) {
+        draw_circle(paddle.pos[0], paddle.pos[1], 100.0 * gl.increaseSZ, 360);
     }
     if (gl.credit != 0) {
 	    //showCredit(gl.xres, gl.yres);

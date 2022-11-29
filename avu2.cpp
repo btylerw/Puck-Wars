@@ -51,6 +51,16 @@ extern void printNumber(int xres, int yres, int num, int enter) {
         }
     }
 }
+void showSuggestion(int xres, int yres) {
+    Rect r;
+    r.left = xres/2 - 81;
+    r.bot = yres/2 - 140;
+    ggprint12(&r, 0, 0x00CC3366, "Try 3");
+    r.left = xres/2 + 80;
+    ggprint12(&r, 0, 0x00CC3366, "Try 1");
+    r.left = xres/2;
+    ggprint12(&r, 0, 0x00CC3366, "Try 1");
+}
 //Credit screen
 extern int showCredit(GLuint creditTexture, int xres, int yres) 
 {	
@@ -148,6 +158,16 @@ void greenCircle(int xres, int yres) {
     //cyan
     glColor3f(0.5f, 1.0f, 1.0f);
     drawCircle(xres/2     , yres/2 - 20, 30, 30);
+}
+
+//shown when left mouse is clicked
+void blinkCircle(int xres, int yres) {
+    Rect r;
+    r.bot = xres/2;
+    r.left = yres/2;
+    r.center = 0;
+    glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+    drawCircle(xres/2, yres/2 - 20, 30, 30);
 }
 //
 //function used to call features
