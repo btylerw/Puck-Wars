@@ -13,7 +13,7 @@ GLfloat b = 1.0f;
 GLfloat colorcheck(GLfloat a);
 
 //create trail
-void trail(int originx, int originy, float *velocity, bool choice)
+void trail(int originx, int originy, float *velocity, int choice)
 {
     int mod, mod2;
     mod = mod2 = 1;

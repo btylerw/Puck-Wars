@@ -25,7 +25,7 @@ using namespace std;
 #include "abotello.h"
 #include "avu2.h"
 #include "amartinez2.h"
-
+#include "adiazperez.h"
 
 typedef float pUpVec[3]; //power up vector
 //some structures
@@ -67,6 +67,8 @@ class Global {
 	int game_over_timer;
 	int ball_move;
     bool cheatPaddle;
+	int feat;
+	int choice;
 	Global()
 	{
 		pressButton = 0;
@@ -104,6 +106,8 @@ class Global {
 		game_over_timer = 0;
 		ball_move = 0;
         cheatPaddle = false;
+		feat = 0;
+		choice = 0;
 	}
 } gl;
 
@@ -468,6 +472,13 @@ int X11_wrapper::check_keys(XEvent *e)
 			break;
 	    case XK_i:
 			gl.intro_screen = !gl.intro_screen;
+			break;
+		case XK_t:
+			gl.feat ^= 1;
+			break;
+		case XK_n:
+			if (gl.feat)
+				gl.choice ^= 1;
 			break;
 		case XK_F9:
 			set_difficulty(0);
@@ -897,5 +908,12 @@ void render()
 		//pass in vector and size of power up
 		drawPowerUps(gl.p1, gl.pUpSize);
 	}
+	if(gl.feat) {
+        trail(puck.pos[0], puck.pos[1], puck.vel, gl.choice);
+        r.left = 497;
+        r.bot = 50;
+        r.center = -5;
+        ggprint16(&r, 10, 0x11ff0044, "n to change pattern");
+    }
 
 }
