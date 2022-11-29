@@ -65,6 +65,7 @@ class Global {
 	int winner;
 	int game_over;
 	int game_over_timer;
+	int ball_move;
 	Global()
 	{
 		pressButton = 0;
@@ -100,6 +101,7 @@ class Global {
 		winner = 0;
 		game_over = 0;
 		game_over_timer = 0;
+		ball_move = 0;
 	}
 } gl;
 
@@ -489,6 +491,9 @@ int X11_wrapper::check_keys(XEvent *e)
 		case XK_q:
 			gl.circleShape ^= 1;
 			break;
+		case XK_F7:
+			gl.ball_move = !gl.ball_move;
+			break;
 		case XK_x:
 			gl.powerUp ^= 1;
 			if(gl.powerUp == 1)
@@ -608,8 +613,15 @@ void physics()
 	// Saving previous paddle pos for velocity calculation
 	int old_pos = paddle.pos[1];
 	// Updates paddle position with new mouse coordinates
-	paddle.pos[0] = gl.mouse_x;
-	paddle.pos[1] = gl.mouse_y;
+	if (!gl.ball_move) {
+		paddle.pos[0] = gl.mouse_x;
+		paddle.pos[1] = gl.mouse_y;
+	}
+	else {
+		puck.vel[0] = puck.vel[1] = 1;
+		puck.pos[0] = gl.mouse_x;
+		puck.pos[1] = gl.mouse_y;
+	}
 	if (paddle.pos[1] > 580)
 	    paddle.pos[1] = 580;
 	paddle.vel[1] = (paddle.pos[1] - old_pos) / 1.5;
