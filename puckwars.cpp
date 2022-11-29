@@ -858,7 +858,7 @@ void render()
 		        gl.del = 0;
 	        }
         }
-        print(gl.xres, gl.yres, gl.del, gl.enter);
+        printNumber(gl.xres, gl.yres, gl.del, gl.enter);
 	    //some cheat codes
 	        if ((gl.enter == 0) && (gl.del == 3)) {
                 gl.player_score = 7;
@@ -874,7 +874,8 @@ void render()
             }
     }
     if (gl.credit != 0) {
-	    showCredit(gl.xres, gl.yres);
+	    //showCredit(gl.xres, gl.yres);
+		showCredit(creditTexture, gl.xres, gl.yres);
     }
 	if(gl.powerUp) {
 		//pass in vector and size of power up

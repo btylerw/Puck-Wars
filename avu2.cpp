@@ -11,7 +11,7 @@
 #include "fonts.h"
 
 //Interact with mouse check function on main
-extern void print(int xres, int yres, int num, int enter) {
+extern void printNumber(int xres, int yres, int num, int enter) {
     Rect r;
     r.bot = yres/2 + 73;
     if (enter == 0) {
@@ -52,21 +52,26 @@ extern void print(int xres, int yres, int num, int enter) {
     }
 }
 //Credit screen
-extern int showCredit(int xres, int yres) 
+extern int showCredit(GLuint creditTexture, int xres, int yres) 
 {	
+    glBindTexture(GL_TEXTURE_2D, creditTexture);
     Rect r;  
-    glColor3f(0.2, 0.2, 0.2);
+    //glColor3f(0.2, 0.2, 0.2);
+    glColor3f(1.0, 1.0, 1.0);
     glBegin(GL_QUADS);
-    glVertex2i(0,    0);
-    glVertex2i(0,    yres);
-    glVertex2i(xres, yres);
-    glVertex2i(xres, 0);
+    glTexCoord2f(0.0f, 1.0f);   glVertex2i(0,    0);
+    glTexCoord2f(0.0f, 0.25f);  glVertex2i(0,    yres);
+    glTexCoord2f(1.0f, 0.25f);  glVertex2i(xres, yres);
+    glTexCoord2f(1.0f, 1.0f);   glVertex2i(xres, 0);
     glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
     r.left = xres/2;
-    r.bot = yres - 150;
-    ggprint16(&r, 0, 0x0000CCCC, "Credit");
-    r.bot = yres - 200;
-    ggprint16(&r, 0, 0x00006600, "Tyler, Andres, Aldair, Anh, Abisai");
+    r.bot = yres - 90;
+    ggprint16(&r, 0, 0x0000CCCC, "Team 7");
+    r.bot = yres - 140;
+    ggprint16(&r, 0, 0x0000CCCC, "Tyler, Andres, Aldair, Anh, Abisai");
+    r.bot = yres - 210;
+    ggprint16(&r, 0, 0x0000CCCC, "PUCK WARS - INSPIRED BY AIR HOCKEY");
     return 0;
 
 }
