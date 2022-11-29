@@ -406,9 +406,6 @@ int X11_wrapper::check_keys(XEvent *e)
 				reset(puck.pos, gl.xres, gl.yres, 
 				puck.vel, gl.firstTime, gl.bricks_feature, 
 				gl.powerUp, gl.increaseSZ);
-				gl.firstTime = true;
-				gl.increaseSZ = 1;
-				gl.powerUp = 0;
 			break;
 	    case XK_p:
 		gl.pause = manage_pstate(gl.pause);
@@ -446,10 +443,6 @@ int X11_wrapper::check_keys(XEvent *e)
 			reset(puck.pos, gl.xres, gl.yres, 
 			puck.vel, gl.firstTime, gl.bricks_feature, 
 			gl.powerUp, gl.increaseSZ);
-			gl.increaseSZ = 1;
-			gl.powerUp = 0;
-			gl.pressed = 0;
-			gl.firstTime = true;
 			gl.pressed = 0;
 		break;
 		case XK_a:
@@ -511,7 +504,7 @@ int X11_wrapper::check_keys(XEvent *e)
 }
 
 // Resets everything to starting positions
-/*
+/*  			Refactored into amartinez.cpp
 void reset()
 {
     puck.pos[0] 	= gl.xres / 2;
@@ -707,10 +700,6 @@ if (!check_autoplay()) {
 		reset(puck.pos, gl.xres, gl.yres, 
 		puck.vel, gl.firstTime, gl.bricks_feature, 
 		gl.powerUp, gl.increaseSZ);
-		gl.increaseSZ = 1;
-			//gl.powerUp = 0;
-			//gl.pressed = 0;
-		gl.firstTime = true;
 
 		if (!gl.intro_screen)
 	    	gl.player_score++;
@@ -721,9 +710,6 @@ if (!check_autoplay()) {
 		reset(puck.pos, gl.xres, gl.yres, 
 		puck.vel, gl.firstTime, gl.bricks_feature, 
 		gl.powerUp, gl.increaseSZ);			
-		gl.increaseSZ = 1;
-		gl.pressed = 0;
-		gl.firstTime = true;
 
 		if (!gl.intro_screen)
 			gl.ai_score++;

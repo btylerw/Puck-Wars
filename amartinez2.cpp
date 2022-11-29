@@ -79,8 +79,8 @@ extern float speedUp(float* vel)
 }
 
 extern void reset(float* puckPos, int xres, int yres, 
-float* velocity, bool firstTime, int brick_feature, 
-int powerUp, int increaseSZ)
+float* velocity, bool& firstTime, int& brick_feature, 
+int& powerUp, int& increaseSZ)
 {
 	puckPos[0] 		= xres / 2;
     puckPos[1] 		= yres / 2;
